@@ -10,6 +10,10 @@ import Foundation
 struct WeeklyBoxOfficeListResponseDTO: Decodable {
     let boxOfficeResult: BoxOfficeResult
     
+    func toDomain() -> [MovieCellData] {
+        boxOfficeResult.toDomain()
+    }
+    
     struct BoxOfficeResult: Decodable {
         let boxofficeType: String
         let showRange: String
@@ -41,20 +45,6 @@ struct BoxOffice: Decodable {
     func toDomain() -> MovieCellData {
         .init(
             uuid: UUID().uuidString,
-            movieCode: movieCd,
-            posterURL: "",
-            currentRank: rank,
-            title: movieNm,
-            openDate: openDt,
-            totalAudience: audiCnt,
-            rankChange: rankInten,
-            isNewEntry: rankOldAndNew == "NEW"
-        )
-    }
-    
-    func toDetailDomain() -> MovieDetailData {
-        .init(
-            uuid: UUID().uuidString,
             posterURL: "",
             currentRank: rank,
             title: movieNm,
@@ -62,26 +52,20 @@ struct BoxOffice: Decodable {
             totalAudience: audiCnt,
             rankChange: rankInten,
             isNewEntry: rankOldAndNew == "NEW",
-            productionYear: "",
-            openYear: "",
-            showTime: "",
-            genreName: "",
-            directorName: "",
-            actors: [],
-            ageLimit: ""
+            movieCode: movieCd
         )
     }
 }
 
 
 extension WeeklyBoxOfficeListResponseDTO.BoxOfficeResult {
-    
+
     func toDomain() -> [MovieCellData] { // posterURL이 빠진 1차 모델 반환
         var movieList = [MovieCellData]()
-        
+
         for movie in weeklyBoxOfficeList {
-            let movieCellData = movie.toDomain()
-            movieList.append(movieCellData)
+            let movieData = movie.toDomain()
+            movieList.append(movieData)
         }
         return movieList
     }
