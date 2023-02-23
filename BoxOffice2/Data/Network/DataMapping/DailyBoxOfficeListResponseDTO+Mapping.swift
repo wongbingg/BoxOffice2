@@ -10,6 +10,10 @@ import Foundation
 struct DailyBoxOfficeListResponseDTO: Decodable {
     let boxOfficeResult: BoxOfficeResult
     
+    func toDomain() -> [MovieCellData] {
+        boxOfficeResult.toDomain()
+    }
+    
     struct BoxOfficeResult: Decodable {
         let boxofficeType: String
         let showRange: String
@@ -23,8 +27,8 @@ extension DailyBoxOfficeListResponseDTO.BoxOfficeResult {
         var movieList = [MovieCellData]()
         
         for movie in dailyBoxOfficeList {
-            let movieCellData = movie.toDomain()
-            movieList.append(movieCellData)
+            let movieData = movie.toDomain()
+            movieList.append(movieData)
         }
         return movieList
     }
