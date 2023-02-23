@@ -9,6 +9,10 @@ import Foundation
 
 struct MovieDetailInfoResponseDTO: Decodable {
     let movieInfoResult: MovieInfoResult
+    
+    func toDomain(with firstModel: MovieCellData) -> MovieDetailData {
+        movieInfoResult.movieInfo.toDomain(with: firstModel)
+    }
 }
 
 extension MovieDetailInfoResponseDTO {
@@ -89,12 +93,12 @@ extension MovieDetailInfoResponseDTO {
     }
 }
 
-extension MovieDetailInfoResponseDTO.MovieInfo { // 일반 조회에서 얻은 모델을 파라미터로 삽입
+extension MovieDetailInfoResponseDTO.MovieInfo {
     
-    func toDomain(with firstModel: MovieDetailData) -> MovieDetailData {
+    func toDomain(with firstModel: MovieCellData) -> MovieDetailData {
         .init(
-            uuid: UUID().uuidString,
-            posterURL: "",
+            uuid: firstModel.uuid,
+            posterURL: firstModel.posterURL,
             currentRank: firstModel.currentRank,
             title: firstModel.title,
             openDate: firstModel.openDate,
@@ -107,7 +111,8 @@ extension MovieDetailInfoResponseDTO.MovieInfo { // 일반 조회에서 얻은 �
             genreName: genres[0].genreNm,
             directorName: directors[0].peopleNm,
             actors: actors.map { $0.toDomain() },
-            ageLimit: audits[0].toDomain()
+            ageLimit: audits[0].toDomain(),
+            movieCode: movieCd
         )
     }
     
