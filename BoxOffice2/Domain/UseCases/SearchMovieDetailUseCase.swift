@@ -17,7 +17,7 @@ struct DefaultSearchMovieDetailUseCase: SearchMovieDetailUseCase {
     func execute(movie: MovieCellData) -> Observable<MovieDetailData> {
         
         return Observable.create { emitter in
-            movieRepository.fetchMovieDetail(movieData: movie)
+            movieRepository.fetchMovieDetail(movieCellData: movie)
                 .subscribe { movieDetail in
                     emitter.onNext(movieDetail)
                 } onError: { error in
