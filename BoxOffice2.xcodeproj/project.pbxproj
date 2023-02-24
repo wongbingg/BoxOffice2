@@ -37,6 +37,8 @@
 		AF51F70E29A72D0B007A5A87 /* Bundle+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF51F70D29A72D0B007A5A87 /* Bundle+Extension.swift */; };
 		AF51F71029A72E55007A5A87 /* WeeklyBoxOfficeListResponseDTO+Mapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF51F70F29A72E55007A5A87 /* WeeklyBoxOfficeListResponseDTO+Mapping.swift */; };
 		AF51F71329A730FA007A5A87 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AF51F71229A730FA007A5A87 /* RxSwift */; };
+		AF54F25729A7A66200A2BC48 /* DTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF54F25629A7A66200A2BC48 /* DTO.swift */; };
+		AF54F25929A7A6B300A2BC48 /* Entity.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF54F25829A7A6B300A2BC48 /* Entity.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -71,6 +73,8 @@
 		AF51F70B29A72CF9007A5A87 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		AF51F70D29A72D0B007A5A87 /* Bundle+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Extension.swift"; sourceTree = "<group>"; };
 		AF51F70F29A72E55007A5A87 /* WeeklyBoxOfficeListResponseDTO+Mapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WeeklyBoxOfficeListResponseDTO+Mapping.swift"; sourceTree = "<group>"; };
+		AF54F25629A7A66200A2BC48 /* DTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTO.swift; sourceTree = "<group>"; };
+		AF54F25829A7A6B300A2BC48 /* Entity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entity.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,16 +119,12 @@
 		AF51F6CF29A70E75007A5A87 /* BoxOffice2 */ = {
 			isa = PBXGroup;
 			children = (
-				AF51F6FE29A72C53007A5A87 /* Infrastructure */,
-				AF51F6F229A72139007A5A87 /* Data */,
-				AF51F6E429A71314007A5A87 /* Domain */,
-				AF51F6D029A70E75007A5A87 /* AppDelegate.swift */,
-				AF51F6D229A70E75007A5A87 /* SceneDelegate.swift */,
 				AF51F6D429A70E75007A5A87 /* ViewController.swift */,
-				AF51F6D929A70E76007A5A87 /* Assets.xcassets */,
-				AF51F6DB29A70E76007A5A87 /* LaunchScreen.storyboard */,
-				AF51F6DE29A70E76007A5A87 /* Info.plist */,
-				AF4A50ED29A76A9E00201906 /* MovieInfo.plist */,
+				AF54F25429A79F0D00A2BC48 /* Application */,
+				AF51F6E429A71314007A5A87 /* Domain */,
+				AF51F6F229A72139007A5A87 /* Data */,
+				AF51F6FE29A72C53007A5A87 /* Infrastructure */,
+				AF54F25529A79F3000A2BC48 /* Resources */,
 			);
 			path = BoxOffice2;
 			sourceTree = "<group>";
@@ -142,6 +142,7 @@
 		AF51F6E529A71319007A5A87 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				AF54F25829A7A6B300A2BC48 /* Entity.swift */,
 				AF51F6EA29A71355007A5A87 /* MovieDetailData.swift */,
 				AF4A50F829A7798700201906 /* MovieCellData.swift */,
 			);
@@ -195,6 +196,7 @@
 		AF51F6F729A721B5007A5A87 /* DataMapping */ = {
 			isa = PBXGroup;
 			children = (
+				AF54F25629A7A66200A2BC48 /* DTO.swift */,
 				AF51F6F829A72254007A5A87 /* DailyBoxOfficeListResponseDTO+Mapping.swift */,
 				AF51F70F29A72E55007A5A87 /* WeeklyBoxOfficeListResponseDTO+Mapping.swift */,
 				AF51F6FA29A725C9007A5A87 /* MovieDetailInfoResponseDTO+Mapping.swift */,
@@ -232,6 +234,26 @@
 				AF51F70D29A72D0B007A5A87 /* Bundle+Extension.swift */,
 			);
 			path = Extension;
+			sourceTree = "<group>";
+		};
+		AF54F25429A79F0D00A2BC48 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				AF51F6D029A70E75007A5A87 /* AppDelegate.swift */,
+				AF51F6D229A70E75007A5A87 /* SceneDelegate.swift */,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
+		AF54F25529A79F3000A2BC48 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AF51F6D929A70E76007A5A87 /* Assets.xcassets */,
+				AF51F6DB29A70E76007A5A87 /* LaunchScreen.storyboard */,
+				AF51F6DE29A70E76007A5A87 /* Info.plist */,
+				AF4A50ED29A76A9E00201906 /* MovieInfo.plist */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -314,6 +336,7 @@
 				AF51F70429A72CA1007A5A87 /* APIClient.swift in Sources */,
 				AF51F6D529A70E75007A5A87 /* ViewController.swift in Sources */,
 				AF51F6ED29A71EC7007A5A87 /* MovieRepository.swift in Sources */,
+				AF54F25729A7A66200A2BC48 /* DTO.swift in Sources */,
 				AF4A50F329A776E200201906 /* SearchWeeklyBoxOfficeListAPI.swift in Sources */,
 				AF4A50F529A776F100201906 /* SearchMovieInfoAPI.swift in Sources */,
 				AF51F6EF29A71F5C007A5A87 /* SearchDailyBoxOfficeUseCase.swift in Sources */,
@@ -326,6 +349,7 @@
 				AF51F70629A72CB4007A5A87 /* APIConfiguration.swift in Sources */,
 				AF51F6D129A70E75007A5A87 /* AppDelegate.swift in Sources */,
 				AF51F6F929A72254007A5A87 /* DailyBoxOfficeListResponseDTO+Mapping.swift in Sources */,
+				AF54F25929A7A6B300A2BC48 /* Entity.swift in Sources */,
 				AF4A50FB29A77E4700201906 /* SearchMovieDetailUseCase.swift in Sources */,
 				AF51F70229A72C93007A5A87 /* API.swift in Sources */,
 				AF51F6FB29A725C9007A5A87 /* MovieDetailInfoResponseDTO+Mapping.swift in Sources */,
@@ -477,7 +501,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SWPBG3YXG5;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BoxOffice2/Info.plist;
+				INFOPLIST_FILE = BoxOffice2/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -504,7 +528,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SWPBG3YXG5;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BoxOffice2/Info.plist;
+				INFOPLIST_FILE = BoxOffice2/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
