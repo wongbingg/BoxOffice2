@@ -5,7 +5,7 @@
 //  Created by 이원빈 on 2023/02/23.
 //
 
-struct MovieDetailData {
+struct MovieDetailData: Entity {
     let uuid: String
     var posterURL: String
     let currentRank: String
@@ -25,6 +25,27 @@ struct MovieDetailData {
 }
 
 extension MovieDetailData {
+    static func union(firstData: MovieCellData,
+                      secondData: MovieDetailData) -> MovieDetailData {
+        .init(uuid: firstData.uuid,
+              posterURL: firstData.posterURL,
+              currentRank: firstData.currentRank,
+              title: firstData.title,
+              openDate: firstData.openDate,
+              totalAudience: firstData.totalAudience,
+              rankChange: firstData.rankChange,
+              isNewEntry: firstData.isNewEntry,
+              productionYear: secondData.productionYear,
+              openYear: secondData.openYear,
+              showTime: secondData.showTime,
+              genreName: secondData.genreName,
+              directorName: secondData.directorName,
+              actors: secondData.actors,
+              ageLimit: secondData.ageLimit,
+              movieCode: firstData.movieCode)
+        
+        
+    }
     static func stub(uuid: String = "" ,
                      posterURL: String = "",
                      currentRank: String = "",

@@ -5,7 +5,7 @@
 //  Created by 이원빈 on 2023/02/23.
 //
 
-struct MovieCellData {
+struct MovieCellData: Entity {
     let uuid: String
     var posterURL: String
     let currentRank: String
@@ -20,3 +20,5 @@ struct MovieCellData {
         posterURL = url
     }
 }
+
+extension Array<MovieCellData>: Entity {}
