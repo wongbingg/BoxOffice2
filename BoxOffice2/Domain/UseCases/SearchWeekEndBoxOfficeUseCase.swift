@@ -22,6 +22,8 @@ struct DefaultSearchWeekEndBoxOfficeUseCase: SearchWeekEndBoxOfficeUseCase {
                     emitter.onNext(movies)
                 } onError: { error in
                     emitter.onError(error)
+                } onCompleted: {
+                    emitter.onCompleted()
                 }
         }
     }

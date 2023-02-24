@@ -14,13 +14,14 @@ final class DefaultMovieRepository: MovieRepository {
     func fetchDailyMovies(date: String) -> Observable<[MovieCellData]> {
         let api = SearchDailyBoxOfficeListAPI(date: date)
         
-        return Observable.create { [weak self] emitter in
-            guard let self = self else { return }
+        return Observable.create { emitter in
             self.search(date: date, with: api)
                 .subscribe { movies in
                     emitter.onNext(movies)
                 } onError: { error in
                     emitter.onError(error)
+                } onCompleted: {
+                    emitter.onCompleted()
                 }
         }
     }
@@ -28,13 +29,14 @@ final class DefaultMovieRepository: MovieRepository {
     func fetchWeekDaysMovies(date: String) -> Observable<[MovieCellData]> {
         let api = SearchWeeklyBoxOfficeListAPI(date: date, weekOption: .weekDays)
         
-        return Observable.create { [weak self] emitter in
-            guard let self = self else { return }
+        return Observable.create { emitter in
             self.search(date: date, with: api)
                 .subscribe { movies in
                     emitter.onNext(movies)
                 } onError: { error in
                     emitter.onError(error)
+                } onCompleted: {
+                    emitter.onCompleted()
                 }
         }
     }
@@ -42,13 +44,14 @@ final class DefaultMovieRepository: MovieRepository {
     func fetchWeekEndMovies(date: String) -> Observable<[MovieCellData]> {
         let api = SearchWeeklyBoxOfficeListAPI(date: date, weekOption: .weekEnd)
         
-        return Observable.create { [weak self] emitter in
-            guard let self = self else { return }
+        return Observable.create { emitter in
             self.search(date: date, with: api)
                 .subscribe { movies in
                     emitter.onNext(movies)
                 } onError: { error in
                     emitter.onError(error)
+                } onCompleted: {
+                    emitter.onCompleted()
                 }
         }
     }
@@ -90,7 +93,8 @@ final class DefaultMovieRepository: MovieRepository {
                         emitter.onError(error)
                     }.disposed(by: self.disposeBag)
                 }
-                
+                emitter.onNext(movieDatas)
+                emitter.onCompleted()
             } onError: { error in
                 emitter.onError(error)
             }
@@ -106,6 +110,7 @@ final class DefaultMovieRepository: MovieRepository {
             api.execute().subscribe(
                 onNext: { response in
                     emitter.onNext(response.toDomain())
+                    emitter.onCompleted()
                 },
                 onError: { error in
                     emitter.onError(error)

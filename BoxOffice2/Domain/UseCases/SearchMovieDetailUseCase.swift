@@ -22,6 +22,8 @@ struct DefaultSearchMovieDetailUseCase: SearchMovieDetailUseCase {
                     emitter.onNext(movieDetail)
                 } onError: { error in
                     emitter.onError(error)
+                } onCompleted: {
+                    emitter.onCompleted()
                 }
         }
     }
