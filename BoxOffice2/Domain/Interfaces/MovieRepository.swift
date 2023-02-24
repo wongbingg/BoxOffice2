@@ -11,5 +11,5 @@ protocol MovieRepository {
     func fetchDailyMovies(date: String) -> Observable<[MovieCellData]>
     func fetchWeekDaysMovies(date: String) -> Observable<[MovieCellData]>
     func fetchWeekEndMovies(date: String) -> Observable<[MovieCellData]>
-    func fetchMovieDetail(movieData: MovieCellData) -> Observable<MovieDetailData>
+    func fetchMovieDetail(movieCellData: MovieCellData) -> Observable<MovieDetailData>
 }
