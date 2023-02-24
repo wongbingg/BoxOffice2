@@ -9,7 +9,7 @@ import Foundation
 import RxSwift
 
 protocol API {
-    associatedtype ResponseType: Decodable
+    associatedtype ResponseType: Decodable, DTO
     var configuration: APIConfiguration { get }
 }
 
