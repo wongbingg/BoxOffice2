@@ -9,18 +9,14 @@ import Foundation
 import RxSwift
 
 final class DefaultMovieRepository: MovieRepository {
-    private enum Mode {
-        case daily
-        case weekDays
-        case weekEnd
-    }
-    
     private let disposeBag = DisposeBag()
     
     func fetchDailyMovies(date: String) -> Observable<[MovieCellData]> {
+        let api = SearchDailyBoxOfficeListAPI(date: date)
         
-        return Observable.create { [self] emitter in
-            searchDailyBoxOffice(date: date)
+        return Observable.create { [weak self] emitter in
+            guard let self = self else { return }
+            self.search(date: date, with: api)
                 .subscribe { movies in
                     emitter.onNext(movies)
                 } onError: { error in
@@ -29,97 +25,75 @@ final class DefaultMovieRepository: MovieRepository {
         }
     }
     
-    private func searchDailyBoxOffice(date: String) -> Observable<[MovieCellData]> {
-        let api = SearchDailyBoxOfficeListAPI(date: date)
-        
-        return Observable.create { emitter in
-            api.execute().subscribe(
-                onNext: { [self] response in
-                    var movieDatas = response.toDomain()
-                    for (index, movieCell) in movieDatas.enumerated() {
-                        fetchMoviePosterURL(
-                            with: movieCell.title,
-                            openYear: String(movieCell.openDate.prefix(4))
-                        ).subscribe { posterURL in
-                            movieDatas[index].setPosterURL(with: posterURL)
-                        } onError: { error in
-                            emitter.onError(error)
-                        }.disposed(by: disposeBag)
-                    }
-                    emitter.onNext(movieDatas)
-                },
-                onError: { error in
-                    emitter.onError(error)
-                }
-            )
-        }
-    }
-    
     func fetchWeekDaysMovies(date: String) -> Observable<[MovieCellData]> {
         let api = SearchWeeklyBoxOfficeListAPI(date: date, weekOption: .weekDays)
         
-        return Observable.create { emitter in
-            api.execute().subscribe(
-                onNext: { [self] response in
-                    var movieDatas = response.toDomain()
-                    for (index, movieCell) in movieDatas.enumerated() {
-                        fetchMoviePosterURL(
-                            with: movieCell.title,
-                            openYear: String(movieCell.openDate.prefix(4))
-                        ).subscribe { posterURL in
-                            movieDatas[index].setPosterURL(with: posterURL)
-                        } onError: { error in
-                            emitter.onError(error)
-                        }.disposed(by: disposeBag)
-                    }
-                    emitter.onNext(movieDatas)
-                },
-                onError: { error in
+        return Observable.create { [weak self] emitter in
+            guard let self = self else { return }
+            self.search(date: date, with: api)
+                .subscribe { movies in
+                    emitter.onNext(movies)
+                } onError: { error in
                     emitter.onError(error)
                 }
-            )
         }
     }
     
     func fetchWeekEndMovies(date: String) -> Observable<[MovieCellData]> {
-        let api = SearchWeeklyBoxOfficeListAPI(date: date, weekOption: .weekDays)
+        let api = SearchWeeklyBoxOfficeListAPI(date: date, weekOption: .weekEnd)
         
-        return Observable.create { emitter in
-            api.execute().subscribe(
-                onNext: { [self] response in
-                    var movieDatas = response.toDomain()
-                    for (index, movieCell) in movieDatas.enumerated() {
-                        fetchMoviePosterURL(
-                            with: movieCell.title,
-                            openYear: String(movieCell.openDate.prefix(4))
-                        ).subscribe { posterURL in
-                            movieDatas[index].setPosterURL(with: posterURL)
-                        } onError: { error in
-                            emitter.onError(error)
-                        }.disposed(by: disposeBag)
-                    }
-                    emitter.onNext(movieDatas)
-                },
-                onError: { error in
+        return Observable.create { [weak self] emitter in
+            guard let self = self else { return }
+            self.search(date: date, with: api)
+                .subscribe { movies in
+                    emitter.onNext(movies)
+                } onError: { error in
                     emitter.onError(error)
                 }
-            )
         }
     }
     
-    func fetchMovieDetail(movieData: MovieCellData) -> Observable<MovieDetailData> {
-        let api = SearchMovieInfoAPI(movieCode: movieData.movieCode)
+    func fetchMovieDetail(movieCellData: MovieCellData) -> Observable<MovieDetailData> {
+        let api = SearchMovieInfoAPI(movieCode: movieCellData.movieCode)
         
         return Observable.create { emitter in
             api.execute().subscribe(
                 onNext: { response in
-                    let movie = response.toDomain(with: movieData)
+                    let movieDetailData = response.toDomain()
+                    let movie = MovieDetailData.union(
+                        firstData: movieCellData,
+                        secondData: movieDetailData
+                    )
                     emitter.onNext(movie)
                 },
                 onError: { error in
                     emitter.onError(error)
                 }
             )
+        }
+    }
+    
+    private func search(date: String, with api: some API) -> Observable<[MovieCellData]> {
+        
+        return Observable.create { emitter in
+            api.execute().subscribe { [weak self] dto in
+                guard let self = self else { return }
+                var movieDatas = dto.toDomain() as! [MovieCellData]
+                
+                for (index, movieCell) in movieDatas.enumerated() {
+                    self.fetchMoviePosterURL(
+                        with: movieCell.title,
+                        openYear: String(movieCell.openDate.prefix(4))
+                    ).subscribe { posterURL in
+                        movieDatas[index].setPosterURL(with: posterURL)
+                    } onError: { error in
+                        emitter.onError(error)
+                    }.disposed(by: self.disposeBag)
+                }
+                
+            } onError: { error in
+                emitter.onError(error)
+            }
         }
     }
     
@@ -131,7 +105,7 @@ final class DefaultMovieRepository: MovieRepository {
         return Observable.create { emitter in
             api.execute().subscribe(
                 onNext: { response in
-                    emitter.onNext(response.posterURLString())
+                    emitter.onNext(response.toDomain())
                 },
                 onError: { error in
                     emitter.onError(error)
