@@ -7,10 +7,11 @@
 
 import Foundation
 
-struct MoviePosterResponseDTO: Decodable {
+struct MoviePosterResponseDTO: DTO {
+    typealias T = String
     let items: [Item]
     
-    func posterURLString() -> String {
+    func toDomain() -> String {
         let posterURL = items[0].image
         return posterURL
     }

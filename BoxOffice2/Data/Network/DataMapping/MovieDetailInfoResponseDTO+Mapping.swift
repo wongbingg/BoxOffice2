@@ -7,11 +7,12 @@
 
 import Foundation
 
-struct MovieDetailInfoResponseDTO: Decodable {
+struct MovieDetailInfoResponseDTO: DTO {
+    typealias T = MovieDetailData
     let movieInfoResult: MovieInfoResult
     
-    func toDomain(with firstModel: MovieCellData) -> MovieDetailData {
-        movieInfoResult.movieInfo.toDomain(with: firstModel)
+    func toDomain() -> MovieDetailData {
+        movieInfoResult.movieInfo.toDomain()
     }
 }
 
@@ -95,16 +96,16 @@ extension MovieDetailInfoResponseDTO {
 
 extension MovieDetailInfoResponseDTO.MovieInfo {
     
-    func toDomain(with firstModel: MovieCellData) -> MovieDetailData {
+    func toDomain() -> MovieDetailData {
         .init(
-            uuid: firstModel.uuid,
-            posterURL: firstModel.posterURL,
-            currentRank: firstModel.currentRank,
-            title: firstModel.title,
-            openDate: firstModel.openDate,
-            totalAudience: firstModel.totalAudience,
-            rankChange: firstModel.rankChange,
-            isNewEntry: firstModel.isNewEntry,
+            uuid: "",
+            posterURL: "",
+            currentRank: "",
+            title: "",
+            openDate: "",
+            totalAudience: "",
+            rankChange: "",
+            isNewEntry: false,
             productionYear: prdtYear,
             openYear: String(openDt.prefix(4)),
             showTime: showTm,

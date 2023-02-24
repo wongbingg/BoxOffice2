@@ -7,7 +7,8 @@
 
 import Foundation
 
-struct WeeklyBoxOfficeListResponseDTO: Decodable {
+struct WeeklyBoxOfficeListResponseDTO: DTO {
+    typealias T = Array<MovieCellData>
     let boxOfficeResult: BoxOfficeResult
     
     func toDomain() -> [MovieCellData] {
