@@ -25,6 +25,7 @@ final class DefaultImageCacheManager: ImageCacheManager {
             if self.cache.cachedResponse(for: request) != nil {
                 let image = self.loadImageFromCache(with: imageURL)
                 emitter.onNext(image)
+                emitter.onCompleted()
             } else {
                 self.downloadImage(with: imageURL)
                     .subscribe { image in
@@ -36,7 +37,6 @@ final class DefaultImageCacheManager: ImageCacheManager {
                     }
                     .disposed(by: self.disposeBag)
             }
-            emitter.onCompleted()
             return Disposables.create()
         }
     }
