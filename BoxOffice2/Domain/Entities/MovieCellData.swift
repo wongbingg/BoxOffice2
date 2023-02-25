@@ -5,7 +5,7 @@
 //  Created by 이원빈 on 2023/02/23.
 //
 
-struct MovieCellData: Entity {
+struct MovieCellData: Entity, Hashable {
     let uuid: String
     var posterURL: String
     let currentRank: String
