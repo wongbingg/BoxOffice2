@@ -8,10 +8,7 @@
 import UIKit
 import RxSwift
 
-enum BoxOfficeMode: String, CaseIterable {
-    case daily = "일별 박스오피스"
-    case weekly = "주간/주말 박스오피스"
-}
+
 
 final class HomeViewController: UIViewController {
     private let disposeBag = DisposeBag()
@@ -29,14 +26,6 @@ final class HomeViewController: UIViewController {
         button.contentHorizontalAlignment = .left
         return button
     }()
-    
-    private var viewMode: BoxOfficeMode {
-        if viewModeChangeButton.currentTitle == "▼ 일별 박스오피스" {
-            return BoxOfficeMode.daily
-        } else {
-            return BoxOfficeMode.weekly
-        }
-    }
     
     private let activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(frame: .zero)
@@ -146,7 +135,7 @@ final class HomeViewController: UIViewController {
     
     // MARK: @objc Methods
     @objc private func viewModeChangeButtonTapped() {
-        let modeSelectViewController = ModeSelectViewController(passMode: viewMode)
+        let modeSelectViewController = ModeSelectViewController(passMode: viewModel.viewMode)
         modeSelectViewController.delegate = self
         
         present(modeSelectViewController, animated: true)
@@ -165,30 +154,7 @@ final class HomeViewController: UIViewController {
 extension HomeViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        if viewMode == .daily {
-//            pushMovieDetail(
-//                in: viewModel.dailyMovieCellDatas?.map { $0.self },
-//                at: indexPath.row
-//            )
-//        } else {
-//            if indexPath.section == 0 {
-//                pushMovieDetail(
-//                    in: viewModel.allWeekMovieCellDatas.value,
-//                    at: indexPath.row
-//                )
-//            } else {
-//                pushMovieDetail(
-//                    in: viewModel.weekEndMovieCellDatas.value,
-//                    at: indexPath.row
-//                )
-//            }
-//        }
-    }
-    func collectionView(_ collectionView: UICollectionView,
-                        willDisplay cell: UICollectionViewCell,
-                        forItemAt indexPath: IndexPath) {
-        homeCollectionView.updateAtIndexPath(indexPath: indexPath)
-        
+        viewModel.movieTapped(at: indexPath)
     }
 }
 
@@ -209,7 +175,8 @@ extension HomeViewController: ModeSelectViewControllerDelegate {
     func didSelectedRowAt(indexPath: Int) {
         activityIndicator.startAnimating()
         let mode = BoxOfficeMode.allCases[indexPath]
-        viewModeChangeButton.setTitle("▼ \(mode.rawValue)", for: .normal)
+        viewModel.changeViewMode(to: mode)
+        viewModeChangeButton.setTitle("▼ \(viewModel.viewMode.rawValue)", for: .normal)
         
         if mode == .daily {
             self.homeCollectionView.switchMode(.daily)
