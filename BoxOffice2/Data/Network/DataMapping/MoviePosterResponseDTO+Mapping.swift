@@ -12,6 +12,7 @@ struct MoviePosterResponseDTO: DTO {
     let items: [Item]
     
     func toDomain() -> String {
+        guard items.count > 0 else { return " " } 
         let posterURL = items[0].image
         return posterURL
     }
