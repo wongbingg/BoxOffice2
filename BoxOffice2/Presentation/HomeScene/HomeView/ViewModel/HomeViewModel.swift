@@ -8,6 +8,11 @@
 import Foundation
 import RxSwift
 
+enum BoxOfficeMode: String, CaseIterable {
+    case daily = "일별 박스오피스"
+    case weekly = "주간/주말 박스오피스"
+}
+
 struct HomeViewModelActions {
     let showMovieDetail: (MovieCellData) -> Void
 }
@@ -17,16 +22,26 @@ protocol HomeViewModelInput {
     func requestAllWeekData(with date: String) -> Observable<[MovieCellData]>
     func requestWeekEndData(with date: String) -> Observable<[MovieCellData]>
     
-    func movieTapped(at movie: MovieCellData)
+    func movieTapped(at indexPath: IndexPath)
+    func changeViewMode(to mode: BoxOfficeMode)
 }
 
 protocol HomeViewModelOutput{
-
+    var dailyBoxOffices: [MovieCellData] { get }
+    var allWeekBoxOffices: [MovieCellData] { get }
+    var weekEndBoxOffices: [MovieCellData] { get }
+    var viewMode: BoxOfficeMode { get }
 }
 
 protocol HomeViewModel: HomeViewModelInput, HomeViewModelOutput {}
 
 final class DefaultHomeViewModel: HomeViewModel {
+    // MARK: Output
+    private(set) var viewMode: BoxOfficeMode = .daily
+    private(set) var dailyBoxOffices: [MovieCellData] = []
+    private(set) var allWeekBoxOffices: [MovieCellData] = []
+    private(set) var weekEndBoxOffices: [MovieCellData] = []
+    
     private let disposeBag = DisposeBag()
     private let actions: HomeViewModelActions?
     private let searchDailyBoxOfficeUseCase: SearchDailyBoxOfficeUseCase
@@ -50,6 +65,7 @@ final class DefaultHomeViewModel: HomeViewModel {
         return Observable.create { [self] emitter in
             searchDailyBoxOfficeUseCase.execute(date: date)
                 .subscribe { movieCellDatas in
+                    self.dailyBoxOffices = movieCellDatas
                     emitter.onNext(movieCellDatas)
                     emitter.onCompleted()
                 } onError: { error in
@@ -64,6 +80,7 @@ final class DefaultHomeViewModel: HomeViewModel {
         return Observable.create { [self] emitter in
             searchWeekDaysBoxOfficeUseCase.execute(date: date)
                 .subscribe { movieCellDatas in
+                    self.allWeekBoxOffices = movieCellDatas
                     emitter.onNext(movieCellDatas)
                     emitter.onCompleted()
                 } onError: { error in
@@ -78,6 +95,7 @@ final class DefaultHomeViewModel: HomeViewModel {
         return Observable.create { [self] emitter in
             searchWeekEndBoxOfficeUseCase.execute(date: date)
                 .subscribe { movieCellDatas in
+                    self.weekEndBoxOffices = movieCellDatas
                     emitter.onNext(movieCellDatas)
                     emitter.onCompleted()
                 } onError: { error in
@@ -87,7 +105,22 @@ final class DefaultHomeViewModel: HomeViewModel {
         }
     }
     
-    func movieTapped(at movie: MovieCellData) {
-        actions?.showMovieDetail(movie)
+    func movieTapped(at indexPath: IndexPath) {
+        if viewMode == .daily {
+            let movie = dailyBoxOffices[indexPath.row]
+            actions?.showMovieDetail(movie)
+        } else {
+            if indexPath.section == 0 {
+                let movie = allWeekBoxOffices[indexPath.row]
+                actions?.showMovieDetail(movie)
+            } else {
+                let movie = weekEndBoxOffices[indexPath.row]
+                actions?.showMovieDetail(movie)
+            }
+        }
+    }
+    
+    func changeViewMode(to mode: BoxOfficeMode) {
+        viewMode = mode
     }
 }
