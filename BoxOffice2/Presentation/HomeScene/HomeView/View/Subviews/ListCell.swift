@@ -1,13 +1,16 @@
 //
-//  GridCell.swift
+//  ListCell.swift
 //  BoxOffice2
 //
 //  Created by 이원빈 on 2023/02/24.
 //
 
 import UIKit
+import RxSwift
 
-final class GridCell: UICollectionViewCell {
+final class ListCell: UICollectionViewCell {
+    private let disposeBag = DisposeBag()
+    private let imageCacheManager = DefaultImageCacheManager()
     
     private let activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(frame: .zero)
@@ -21,11 +24,8 @@ final class GridCell: UICollectionViewCell {
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         imageView.tintColor = .systemGray3
-        imageView.layer.borderWidth = 1
-        imageView.layer.borderColor = UIColor.systemGray3.cgColor
-        imageView.layer.cornerRadius = 10
         imageView.clipsToBounds = true
         return imageView
     }()
@@ -33,25 +33,37 @@ final class GridCell: UICollectionViewCell {
     private let mainStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.axis = .vertical
+        stackView.axis = .horizontal
+        stackView.isLayoutMarginsRelativeArrangement = true
+        stackView.layoutMargins = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
         stackView.alignment = .top
+        stackView.spacing = 10
         return stackView
     }()
     
     private let infoStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.isLayoutMarginsRelativeArrangement = true
+        stackView.layoutMargins = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
         stackView.axis = .vertical
         stackView.alignment = .leading
+        stackView.spacing = 10
         return stackView
+    }()
+    
+    private let rankLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.preferredFont(forTextStyle: .largeTitle)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .title2)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
-        label.setContentHuggingPriority(UILayoutPriority(100), for: .vertical)
+        label.numberOfLines = 2
         return label
     }()
     
@@ -61,6 +73,15 @@ final class GridCell: UICollectionViewCell {
         stackView.axis = .horizontal
         stackView.spacing = 5
         return stackView
+    }()
+    
+    private let fakeView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.widthAnchor.constraint(equalToConstant: 10).isActive = true
+        view.heightAnchor.constraint(greaterThanOrEqualToConstant: 1).isActive = true
+        view.setContentHuggingPriority(.init(100), for: .vertical)
+        return view
     }()
     
     private let rankChangeBadgeLabel: UILabel = {
@@ -97,28 +118,9 @@ final class GridCell: UICollectionViewCell {
         return label
     }()
     
-    private let rankBackgroundView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .black
-        view.alpha = 0.5
-        return view
-    }()
-    
-    private let fakeView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.widthAnchor.constraint(equalToConstant: 10).isActive = true
-        view.heightAnchor.constraint(greaterThanOrEqualToConstant: 1).isActive = true
-        view.setContentHuggingPriority(.init(100), for: .vertical)
-        return view
-    }()
-    
-    private let currentRanklabel = MovieLabel(font: .largeTitle, isBold: true)
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        currentRanklabel.textColor = .white
+        backgroundColor = .systemBackground
         addSubViews()
         setupLayout()
     }
@@ -129,23 +131,62 @@ final class GridCell: UICollectionViewCell {
     
     func setup(with data: MovieCellData) {
         titleLabel.text = data.title
-        currentRanklabel.text = data.currentRank
+        rankLabel.text = data.currentRank
+
         setOpenDateLabel(with: data.openDate)
         setRankChangeLabel(with: data.rankChange)
         setTotalAudiencesCountLabel(with: data.totalAudience)
         setNewEntryBadgeLabel(with: data.isNewEntry)
-        setPosterImageView(with: data.posterURL)
+
+        activityIndicator.startAnimating()
+        setPosterImageView(with: data)
+            .observe(on: MainScheduler.instance)
+            .subscribe { image in
+                self.posterImageView.image = image
+            } onError: { error in
+                print(error.localizedDescription)
+            } onCompleted: {
+                self.activityIndicator.stopAnimating()
+                // 컬렉션뷰 index 업데이트
+                // TODO: 셀 이미지가 받아와 지고, 해당 indexPath에 있는 셀만 업데이트
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    private func setPosterImageView(with data: MovieCellData) -> Observable<UIImage> {
+        
+        return Observable.create { emitter in
+            SearchMoviePosterAPI(movieTitle: data.title).execute()
+                .observe(on: MainScheduler.instance)
+                .subscribe { [self] response in
+                    let url = response.toDomain()
+                    guard let url = URL(string: url) else {
+                        return
+                    }
+                    
+                    imageCacheManager.getImage(with: url)
+                        .observe(on: MainScheduler.instance)
+                        .subscribe { image in
+                            guard let image = image else { return }
+                            emitter.onNext(image)
+                        } onError: { error in
+                            emitter.onError(error)
+                        } onCompleted: {
+                            emitter.onCompleted()
+                        }
+                        .disposed(by: disposeBag)
+                    
+                } onError: { error in
+                    emitter.onError(error)
+                }
+                .disposed(by: self.disposeBag)
+            
+            return Disposables.create()
+        }
     }
     
     private func setOpenDateLabel(with openDate: String) {
-        let characterArray = Array(openDate).map { String($0) }
-        let date = characterArray[0...3].joined()
-        + "-"
-        + characterArray[4...5].joined()
-        + "-" + characterArray[6...7].joined()
-        + " 개봉"
-        
-        openDateLabel.text = date
+        openDateLabel.text = openDate + " 개봉"
     }
     
     private func setRankChangeLabel(with rankChange: String) {
@@ -169,46 +210,41 @@ final class GridCell: UICollectionViewCell {
     }
     
     private func setTotalAudiencesCountLabel(with totalAudience: String) {
-        totalAudiencesCountLabel.text = "관객수 " + totalAudience.toDecimal() + "명"
+        totalAudiencesCountLabel.text = "관객수 " + totalAudience + "명"
     }
     
-    private func setPosterImageView(with url: String) {
-        // TODO: PosterURL 가지고 이미지 받아오기
-        activityIndicator.startAnimating()
-//        if let image = image {
-//            posterImageView.image = image
-//        } else {
-//            let image = UIImage(systemName: "nosign")
-//            posterImageView.backgroundColor = .systemGray6
-//            posterImageView.image = image
-//        }
+    override func draw(_ rect: CGRect) {
+        let separator = UIBezierPath()
+        separator.move(to: CGPoint(x: 0, y: bounds.maxY))
+        separator.addLine(to: CGPoint(x: bounds.maxX, y: bounds.maxY))
+        separator.lineWidth = 2
+        UIColor.lightGray.setStroke()
+        separator.stroke()
+        separator.close()
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
         rankChangeBadgeLabel.isHidden = false
         posterImageView.image = UIImage()
-        posterImageView.backgroundColor = nil
     }
 }
 
 // MARK: Setup Layout
-private extension GridCell {
+private extension ListCell {
     func addSubViews() {
         addSubview(mainStackView)
         mainStackView.addArrangedSubview(posterImageView)
         posterImageView.addSubview(activityIndicator)
+        mainStackView.addArrangedSubview(rankLabel)
         mainStackView.addArrangedSubview(infoStackView)
         infoStackView.addArrangedSubview(titleLabel)
         infoStackView.addArrangedSubview(badgeStackView)
         badgeStackView.addArrangedSubview(rankChangeBadgeLabel)
         badgeStackView.addArrangedSubview(newEntryBadgeLabel)
+        infoStackView.addArrangedSubview(fakeView)
         infoStackView.addArrangedSubview(totalAudiencesCountLabel)
         infoStackView.addArrangedSubview(openDateLabel)
-        infoStackView.addArrangedSubview(fakeView)
-        
-        addSubview(rankBackgroundView)
-        rankBackgroundView.addSubview(currentRanklabel)
     }
     
     func setupLayout() {
@@ -218,32 +254,11 @@ private extension GridCell {
             mainStackView.leadingAnchor.constraint(equalTo: leadingAnchor),
             mainStackView.trailingAnchor.constraint(equalTo: trailingAnchor),
             
-            currentRanklabel.centerXAnchor.constraint(equalTo: rankBackgroundView.centerXAnchor),
-            currentRanklabel.centerYAnchor.constraint(equalTo: rankBackgroundView.centerYAnchor),
-            
-            rankBackgroundView.topAnchor.constraint(equalTo: posterImageView.topAnchor),
-            rankBackgroundView.leadingAnchor.constraint(equalTo: posterImageView.leadingAnchor),
-            rankBackgroundView.widthAnchor.constraint(equalTo: posterImageView.widthAnchor, multiplier: 0.2),
-            rankBackgroundView.heightAnchor.constraint(equalTo: rankBackgroundView.widthAnchor),
-            
-            posterImageView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.7),
-            posterImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            posterImageView.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width*0.25),
+            posterImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
             
             activityIndicator.centerXAnchor.constraint(equalTo: posterImageView.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: posterImageView.centerYAnchor)
         ])
-    }
-}
-
-extension String {
-    var numberFormatter: NumberFormatter {
-        let numberFormatter = NumberFormatter()
-        numberFormatter.numberStyle = .decimal
-        return numberFormatter
-    }
-    
-    func toDecimal() -> String {
-        guard let number = Int(self) else { return "" }
-        return numberFormatter.string(from: NSNumber(integerLiteral: number)) ?? ""
     }
 }
