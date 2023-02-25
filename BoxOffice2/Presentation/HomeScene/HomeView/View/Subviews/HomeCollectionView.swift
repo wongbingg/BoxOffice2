@@ -30,12 +30,6 @@ final class HomeCollectionView: UICollectionView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateAtIndexPath(indexPath: IndexPath) {
-        let items = snapshot.itemIdentifiers
-        
-        snapshot.reloadItems([items[indexPath.row]])
-    }
-    
     private func configureHierachy() {
         frame = bounds
         collectionViewLayout = createDailyLayout()
