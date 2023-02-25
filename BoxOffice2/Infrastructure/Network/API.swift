@@ -26,14 +26,13 @@ extension API {
                     do {
                         let result = try JSONDecoder().decode(ResponseType.self, from: data)
                         emitter.onNext(result)
-                        emitter.onCompleted()
                     } catch let error {
                         emitter.onError(error)
                     }
                 } onError: { error in
-                    print(error.localizedDescription)
+                    emitter.onError(error)
                 } onCompleted: {
-                    print("completed")
+                    emitter.onCompleted()
                 }
             return task
         }
