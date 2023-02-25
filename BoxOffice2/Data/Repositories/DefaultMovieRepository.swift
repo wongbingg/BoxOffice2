@@ -89,9 +89,9 @@ final class DefaultMovieRepository: MovieRepository {
         }
     }
     
-    private func fetchMoviePosterURL(with movieName: String) -> Observable<String> {
+    private func fetchMoviePosterURL(with movieName: String, year: String) -> Observable<String> {
         
-        let api = SearchMoviePosterAPI(movieTitle: movieName)
+        let api = SearchMoviePosterAPI(movieTitle: movieName, year: year)
 
         return Observable.create { emitter in
             api.execute().subscribe(
