@@ -24,6 +24,26 @@ final class HomeSceneDIContainer {
         )
     }
     
+    // MARK: - Movie Detail View
+    func makeMovieDetailViewController(actions: MovieDetailViewModelActions,
+                                       movieCellData: MovieCellData) -> MovieDetailViewController {
+        let viewModel = makeMovieDetailViewModel(
+            actions: actions,
+            movieCellData: movieCellData
+        )
+        return MovieDetailViewController(with: viewModel)
+    }
+    
+    func makeMovieDetailViewModel(actions: MovieDetailViewModelActions,
+                                  movieCellData: MovieCellData) -> MovieDetailViewModel {
+        
+        return DefaultMovieDetailViewModel(
+            actions: actions,
+            movieCellData: movieCellData,
+            searchMovieDetailUseCase: makeSearchMovieDetailUseCase()
+        )
+    }
+    
     // MARK: - UseCases
     func makeSearchDailyBoxOfficeUseCase() -> SearchDailyBoxOfficeUseCase {
         return DefaultSearchDailyBoxOfficeUseCase(
@@ -39,6 +59,12 @@ final class HomeSceneDIContainer {
     
     func makeSearchWeekEndBoxOfficeUseCase() -> SearchWeekEndBoxOfficeUseCase {
         return DefaultSearchWeekEndBoxOfficeUseCase(
+            movieRepository: makeMovieRepository()
+        )
+    }
+    
+    func makeSearchMovieDetailUseCase() -> SearchMovieDetailUseCase {
+        return DefaultSearchMovieDetailUseCase(
             movieRepository: makeMovieRepository()
         )
     }
