@@ -9,6 +9,9 @@ import UIKit
 
 protocol HomeFlowCoordinatorDependencies: AnyObject {
     func makeHomeViewController(actions: HomeViewModelActions) -> HomeViewController
+    
+    func makeMovieDetailViewController(actions: MovieDetailViewModelActions,
+                                       movieCellData: MovieCellData) -> MovieDetailViewController
 }
 
 final class HomeFlowCoordinator {
@@ -32,5 +35,11 @@ final class HomeFlowCoordinator {
     // MARK: - View Transition
     private func showMovieDetail(with movieCellData: MovieCellData) {
         // 다음씬 생성 후 이동
+        let actions = MovieDetailViewModelActions()
+        let movieDetailVC = dependencies.makeMovieDetailViewController(
+            actions: actions,
+            movieCellData: movieCellData
+        )
+        navigationController.pushViewController(movieDetailVC, animated: true)
     }
 }
