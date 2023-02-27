@@ -1,0 +1,18 @@
+/* 
+  Localizable.strings
+  BoxOffice2
+
+  Created by 이원빈 on 2023/02/27.
+  
+*/
+"▼ 일별 박스오피스" = "▼ Daily BoxOffice";
+"▼ 주간/주말 박스오피스" = "▼ Weekly BoxOffice";
+"영화목록" = "Movie List";
+"보기 모드" = "View Mode";
+"일별 박스오피스" = "Daily BoxOffice";
+"주간/주말 박스오피스" = "Weekly BoxOffice";
+"날짜 선택" = "Choose Date";
+"주간 박스오피스" = "Weekly BoxOffice";
+"주말 박스오피스" = "Weekend BoxOffice";
+"더보기" = "see more";
+"출연진 정보" = "Actor List";
