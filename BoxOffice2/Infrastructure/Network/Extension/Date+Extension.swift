@@ -22,6 +22,12 @@ extension Date {
         dateFormatter.string(from: self)
     }
     
+    func toSectionHeaderString() -> String {
+        let customDateFormatter = dateFormatter
+        customDateFormatter.dateFormat = "yyyy년 MM월 dd일"
+        return customDateFormatter.string(from: self)
+    }
+    
     func toDate(from dateText: String) -> Date {
         guard let date = dateFormatter.date(from: dateText) else {
             return Date()
