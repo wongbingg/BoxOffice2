@@ -41,7 +41,6 @@ final class DefaultMovieDetailViewModel: MovieDetailViewModel {
         self.searchMovieDetailUseCase = searchMovieDetailUseCase
     }
     
-    
     func fetchMovieDetailData() -> Observable<MovieDetailData> {
         
         return Observable.create { [self] emitter in
@@ -54,8 +53,6 @@ final class DefaultMovieDetailViewModel: MovieDetailViewModel {
                 } onCompleted: {
                     emitter.onCompleted()
                 }
-                .disposed(by: disposeBag)
-            return Disposables.create()
         }
     }
     
