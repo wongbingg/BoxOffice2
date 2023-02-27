@@ -8,9 +8,8 @@
 import UIKit
 import RxSwift
 
-final class ListCell: UICollectionViewCell {
+final class ListCell: UICollectionViewCell, MovieCellProtocol {
     private let disposeBag = DisposeBag()
-    private let imageCacheManager = DefaultImageCacheManager()
     
     private let activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(frame: .zero)
@@ -118,6 +117,7 @@ final class ListCell: UICollectionViewCell {
         return label
     }()
     
+    // MARK: Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .systemBackground
@@ -129,6 +129,7 @@ final class ListCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: Internal Methods
     func setup(with data: MovieCellData) {
         titleLabel.text = data.title
         rankLabel.text = data.currentRank
@@ -137,52 +138,47 @@ final class ListCell: UICollectionViewCell {
         setRankChangeLabel(with: data.rankChange)
         setTotalAudiencesCountLabel(with: data.totalAudience)
         setNewEntryBadgeLabel(with: data.isNewEntry)
-
         activityIndicator.startAnimating()
-        setPosterImageView(with: data)
-            .observe(on: MainScheduler.instance)
-            .subscribe { image in
-                self.posterImageView.image = image
-            } onError: { error in
-                print(error.localizedDescription)
-            } onCompleted: {
-                self.activityIndicator.stopAnimating()
-                // 컬렉션뷰 index 업데이트
-                // TODO: 셀 이미지가 받아와 지고, 해당 indexPath에 있는 셀만 업데이트
-            }
-            .disposed(by: disposeBag)
+    }
+
+    func setPosterImageView(with image: UIImage) {
+        DispatchQueue.main.async {
+            self.posterImageView.image = image
+            self.activityIndicator.stopAnimating()
+        }
     }
     
-    private func setPosterImageView(with data: MovieCellData) -> Observable<UIImage> {
-        
-        return Observable.create { emitter in
-            SearchMoviePosterAPI(movieTitle: data.title).execute()
-                .observe(on: MainScheduler.instance)
-                .subscribe { [self] response in
-                    let url = response.toDomain()
-                    guard let url = URL(string: url) else {
-                        return
-                    }
-                    
-                    imageCacheManager.getImage(with: url)
-                        .observe(on: MainScheduler.instance)
-                        .subscribe { image in
-                            guard let image = image else { return }
-                            emitter.onNext(image)
-                        } onError: { error in
-                            emitter.onError(error)
-                        } onCompleted: {
-                            emitter.onCompleted()
-                        }
-                        .disposed(by: disposeBag)
-                    
-                } onError: { error in
-                    emitter.onError(error)
-                }
-                .disposed(by: self.disposeBag)
-            
-            return Disposables.create()
+    func stopActivityIndicator() {
+        DispatchQueue.main.async {
+            self.activityIndicator.stopAnimating()
         }
+    }
+    
+    // MARK: Override Methods
+    override func draw(_ rect: CGRect) {
+        let separator = UIBezierPath()
+        separator.move(to: CGPoint(x: 0, y: bounds.maxY))
+        separator.addLine(to: CGPoint(x: bounds.maxX, y: bounds.maxY))
+        separator.lineWidth = 2
+        UIColor.lightGray.setStroke()
+        separator.stroke()
+        separator.close()
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        rankChangeBadgeLabel.isHidden = false
+        setDefaultImage()
+    }
+}
+
+// MARK: - Private Methods
+private extension ListCell {
+    
+    private func setDefaultImage() {
+        let noSignImage = UIImage(systemName: "nosign")
+        self.posterImageView.image = noSignImage
+        self.posterImageView.contentMode = .scaleAspectFit
     }
     
     private func setOpenDateLabel(with openDate: String) {
@@ -212,25 +208,9 @@ final class ListCell: UICollectionViewCell {
     private func setTotalAudiencesCountLabel(with totalAudience: String) {
         totalAudiencesCountLabel.text = "관객수 " + totalAudience + "명"
     }
-    
-    override func draw(_ rect: CGRect) {
-        let separator = UIBezierPath()
-        separator.move(to: CGPoint(x: 0, y: bounds.maxY))
-        separator.addLine(to: CGPoint(x: bounds.maxX, y: bounds.maxY))
-        separator.lineWidth = 2
-        UIColor.lightGray.setStroke()
-        separator.stroke()
-        separator.close()
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        rankChangeBadgeLabel.isHidden = false
-        posterImageView.image = UIImage()
-    }
 }
 
-// MARK: Setup Layout
+// MARK:  - Setup Layout
 private extension ListCell {
     func addSubViews() {
         addSubview(mainStackView)
