@@ -9,18 +9,31 @@ import UIKit
 import RxSwift
 
 final class HomeCollectionView: UICollectionView {
+
     private enum Section: String, CaseIterable {
         case allWeek = "주간 박스오피스"
         case weekEnd = "주말 박스오피스"
         case main
     }
     
-    var currentDate = ""
     private var currentViewMode: BoxOfficeMode = .daily
-    private var homeDataSource: UICollectionViewDiffableDataSource<Section, MovieCellData>?
-    private var snapshot = NSDiffableDataSourceSnapshot<Section, MovieCellData>()
+    private var homeDataSource: UICollectionViewDiffableDataSource<Section, String>?
+    private var snapshot = NSDiffableDataSourceSnapshot<Section, String>()
+    private var assets: [String: UIImage] = [:]
     
-    init() {
+    private let disposeBag = DisposeBag()
+    private let viewModel: HomeViewModel
+    private let posterImageRepository: PosterImageRepository
+    
+    var currentDate = ""
+    
+    // MARK: Initializers
+    init(
+        viewModel: HomeViewModel,
+        posterImageRepository: PosterImageRepository
+    ) {
+        self.viewModel = viewModel
+        self.posterImageRepository = posterImageRepository
         super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         configureHierachy()
         configureDataSource(with: createDailyCellRegistration())
@@ -30,13 +43,56 @@ final class HomeCollectionView: UICollectionView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func configureHierachy() {
+    // MARK: Internal Methods
+    func appendDailySnapshot(with cellDatas: [String]) {
+        guard cellDatas.count > 0 else { return }
+        snapshot.appendItems(cellDatas)
+        homeDataSource?.apply(snapshot, animatingDifferences: true)
+    }
+    
+    func appendAllWeekSnapshot(with data: [String]) {
+        guard data.count > 0 else { return }
+        snapshot.appendItems(data, toSection: .allWeek)
+        homeDataSource?.apply(snapshot, animatingDifferences: true)
+    }
+    
+    func appendWeekEndSnapshot(with data: [String]) {
+        guard data.count > 0 else { return }
+        snapshot.appendItems(data, toSection: .weekEnd)
+        homeDataSource?.apply(snapshot, animatingDifferences: true)
+    }
+    
+    func switchMode(_ mode: BoxOfficeMode){
+        if mode == .daily {
+            switchLayout(to: .daily)
+            currentViewMode = .daily
+            configureDataSource(with: createDailyCellRegistration())
+        } else {
+            switchLayout(to: .weekly)
+            currentViewMode = .weekly
+            configureDataSource(with: createWeeklyCellRegistration())
+        }
+    }
+    
+    private func switchLayout(to mode: BoxOfficeMode) {
+        if mode == .daily {
+            setCollectionViewLayout(createDailyLayout(), animated: false)
+        } else {
+            setCollectionViewLayout(createWeeklyLayout(), animated: false)
+        }
+    }
+}
+
+private extension HomeCollectionView {
+    // MARK: - Hierachy Setting
+    func configureHierachy() {
         frame = bounds
         collectionViewLayout = createDailyLayout()
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
     }
     
-    private func createDailyLayout() -> UICollectionViewLayout {
+    // MARK: - Layout Settings
+    func createDailyLayout() -> UICollectionViewLayout {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(1.0)
@@ -75,7 +131,7 @@ final class HomeCollectionView: UICollectionView {
         return layout
     }
     
-    private func createWeeklyLayout() -> UICollectionViewLayout {
+    func createWeeklyLayout() -> UICollectionViewLayout {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(1.0)
@@ -114,8 +170,9 @@ final class HomeCollectionView: UICollectionView {
         return layout
     }
   
-    private func configureDataSource<T: UICollectionViewCell>(
-        with cellRegistration: UICollectionView.CellRegistration<T, MovieCellData>
+    // MARK: - DataSource Settings
+    func configureDataSource<T: UICollectionViewCell>(
+        with cellRegistration: UICollectionView.CellRegistration<T, String>
     ) {
         let headerRegistration = createHeaderRegistration()
         homeDataSource = createDataSource(with: cellRegistration)
@@ -134,13 +191,32 @@ final class HomeCollectionView: UICollectionView {
         }
     }
     
-    private func createHeaderRegistration() -> UICollectionView.SupplementaryRegistration<HeaderView> {
-        let headerRegistration = UICollectionView.SupplementaryRegistration<HeaderView>(elementKind: "headerView") {
-            (supplementaryView, elementKind, indexPath) in
+    private func createDataSource<T: UICollectionViewCell>(
+        with cellRegistration: UICollectionView.CellRegistration<T, String>
+    ) -> UICollectionViewDiffableDataSource<Section, String>? {
+        let dataSource = UICollectionViewDiffableDataSource<Section, String>(
+            collectionView: self) {
+            (collectionView: UICollectionView,
+             indexPath: IndexPath,
+             itemIdentifier: String) -> UICollectionViewCell? in
+                
+            return collectionView.dequeueConfiguredReusableCell(
+                using: cellRegistration,
+                for: indexPath,
+                item: itemIdentifier
+            )
+        }
+        return dataSource
+    }
+    
+    func createHeaderRegistration() -> UICollectionView.SupplementaryRegistration<HeaderView> {
+        let headerRegistration = UICollectionView.SupplementaryRegistration<HeaderView>(
+            elementKind: "headerView"
+        ) { (supplementaryView, elementKind, indexPath) in
+            
             if self.currentViewMode == .daily {
                 guard self.currentDate != "" else { return }
-                let dateArray = Array(self.currentDate).map { String($0) }
-                supplementaryView.sectionHeaderlabel.text = "\(dateArray[0...3].joined())년 \(dateArray[4...5].joined())월 \(dateArray[6...7].joined())일"
+                supplementaryView.sectionHeaderlabel.text = self.currentDate
             } else {
                 supplementaryView.sectionHeaderlabel.text = Section.allCases[indexPath.section].rawValue
             }
@@ -148,65 +224,57 @@ final class HomeCollectionView: UICollectionView {
         return headerRegistration
     }
     
-    private func createDailyCellRegistration() -> UICollectionView.CellRegistration<ListCell, MovieCellData> {
-        let cellRegistration = UICollectionView.CellRegistration<ListCell, MovieCellData> { (cell, _, item) in
-            cell.setup(with: item)
+    // MARK: - Cell Registration Settings
+    func createDailyCellRegistration(
+    ) -> UICollectionView.CellRegistration<ListCell, String> {
+        
+        let cellRegistration = UICollectionView.CellRegistration<ListCell, String> { (cell, _, id) in
+            
+            let item = self.viewModel.dailyBoxOffices.value.filter { $0.uuid == id }
+            self.setupCell(with: item[0], at: cell, id: id)
         }
         return cellRegistration
     }
     
-    private func createWeeklyCellRegistration() -> UICollectionView.CellRegistration<GridCell, MovieCellData> {
-        let cellRegistration = UICollectionView.CellRegistration<GridCell, MovieCellData> { (cell, _, item) in
-            cell.setup(with: item)
+    func createWeeklyCellRegistration(
+    ) -> UICollectionView.CellRegistration<GridCell, String> {
+        
+        let cellRegistration = UICollectionView.CellRegistration<GridCell, String> { cell, index, id in
+
+            let list = self.viewModel.allWeekBoxOffices.value + self.viewModel.weekEndBoxOffices.value
+            let item = list.filter { $0.uuid == id }
+            self.setupCell(with: item[0], at: cell, id: id)
         }
         return cellRegistration
     }
     
-    private func createDataSource<T: UICollectionViewCell>(
-        with cellRegistration: UICollectionView.CellRegistration<T, MovieCellData>
-    ) -> UICollectionViewDiffableDataSource<Section, MovieCellData>? {
-        let dataSource = UICollectionViewDiffableDataSource<Section, MovieCellData>(collectionView: self) {
-            (collectionView: UICollectionView, indexPath: IndexPath, itemIdentifier: MovieCellData) -> UICollectionViewCell? in
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
-        }
-        return dataSource
-    }
-    
-    private func switchLayout(to mode: BoxOfficeMode) {
-        if mode == .daily {
-            setCollectionViewLayout(createDailyLayout(), animated: false)
+    func setupCell(with item: MovieCellData, at cell: MovieCellProtocol, id: String) {
+        cell.setup(with: item)
+
+        if let image = self.assets[item.title] {
+            cell.setPosterImageView(with: image)
         } else {
-            setCollectionViewLayout(createWeeklyLayout(), animated: false)
+            self.posterImageRepository.fetchPosterImage(with: item.title, year: nil)
+                .subscribe { image in
+                    guard let image = image else { return }
+                    cell.setPosterImageView(with: image)
+                    self.assets[item.title] = image
+                } onError: { error in
+                    print(error.localizedDescription)
+                    cell.stopActivityIndicator()
+                } onCompleted: {
+                    DispatchQueue.main.async {
+                        self.setPostNeedsUpdate(id: id)
+                    }
+                }
+                .disposed(by: self.disposeBag)
         }
     }
     
-    func appendDailySnapshot(with cellDatas: [MovieCellData]) {
-        guard cellDatas.count > 0 else { return }
-        snapshot.appendItems(cellDatas)
-        homeDataSource?.apply(snapshot, animatingDifferences: true)
-    }
-    
-    func appendAllWeekSnapshot(with data: [MovieCellData]) {
-        guard data.count > 0 else { return }
-        snapshot.appendItems(data, toSection: .allWeek)
-        homeDataSource?.apply(snapshot, animatingDifferences: true)
-    }
-    
-    func appendWeekEndSnapshot(with data: [MovieCellData]) {
-        guard data.count > 0 else { return }
-        snapshot.appendItems(data, toSection: .weekEnd)
-        homeDataSource?.apply(snapshot, animatingDifferences: true)
-    }
-    
-    func switchMode(_ mode: BoxOfficeMode){
-        if mode == .daily {
-            switchLayout(to: .daily)
-            currentViewMode = .daily
-            configureDataSource(with: createDailyCellRegistration())
-        } else {
-            switchLayout(to: .weekly)
-            currentViewMode = .weekly
-            configureDataSource(with: createWeeklyCellRegistration())
-        }
+    func setPostNeedsUpdate(id: String) {
+        
+        guard var snapshot = self.homeDataSource?.snapshot() else { return }
+        snapshot.reconfigureItems([id])
+        self.homeDataSource?.apply(snapshot, animatingDifferences: true)
     }
 }
