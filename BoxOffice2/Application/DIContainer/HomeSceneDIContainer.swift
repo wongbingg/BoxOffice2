@@ -9,10 +9,15 @@ import UIKit
 
 final class HomeSceneDIContainer {
     
+    private lazy var posterImageRepository = makePosterImageRepository()
+    
     // MARK: - Home View
     func makeHomeViewController(actions: HomeViewModelActions) -> HomeViewController {
         let viewModel = makeHomeViewModel(actions: actions)
-        return HomeViewController(with: viewModel)
+        return HomeViewController(
+            with: viewModel,
+            posterImageRepository: posterImageRepository
+        )
     }
     
     func makeHomeViewModel(actions: HomeViewModelActions) -> HomeViewModel {
@@ -31,7 +36,10 @@ final class HomeSceneDIContainer {
             actions: actions,
             movieCellData: movieCellData
         )
-        return MovieDetailViewController(with: viewModel)
+        return MovieDetailViewController(
+            with: viewModel,
+            posterImageRepository: posterImageRepository
+        )
     }
     
     func makeMovieDetailViewModel(actions: MovieDetailViewModelActions,
@@ -72,6 +80,12 @@ final class HomeSceneDIContainer {
     // MARK: - Repositories
     func makeMovieRepository() -> MovieRepository {
         return DefaultMovieRepository()
+    }
+    
+    func makePosterImageRepository() -> PosterImageRepository {
+        return DefaultPosterImageRepository(
+            imageCacheManager: DefaultImageCacheManager()
+        )
     }
     
     // MARK: - Home Flow Coordinator
