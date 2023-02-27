@@ -46,7 +46,6 @@ struct BoxOffice: Decodable {
     func toDomain() -> MovieCellData {
         .init(
             uuid: UUID().uuidString,
-            posterURL: "",
             currentRank: rank,
             title: movieNm,
             openDate: openDt,

@@ -7,7 +7,6 @@
 
 struct MovieCellData: Entity, Hashable {
     let uuid: String
-    var posterURL: String
     let currentRank: String
     let title: String
     let openDate: String
@@ -15,10 +14,6 @@ struct MovieCellData: Entity, Hashable {
     let rankChange: String
     let isNewEntry: Bool
     let movieCode: String
-    
-    mutating func setPosterURL(with url: String) {
-        posterURL = url
-    }
 }
 
 extension Array<MovieCellData>: Entity {}

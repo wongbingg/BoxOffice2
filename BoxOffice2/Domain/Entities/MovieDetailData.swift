@@ -7,7 +7,6 @@
 
 struct MovieDetailData: Entity {
     let uuid: String
-    var posterURL: String
     let currentRank: String
     let title: String
     let openDate: String
@@ -28,7 +27,6 @@ extension MovieDetailData {
     static func union(firstData: MovieCellData,
                       secondData: MovieDetailData) -> MovieDetailData {
         .init(uuid: firstData.uuid,
-              posterURL: firstData.posterURL,
               currentRank: firstData.currentRank,
               title: firstData.title,
               openDate: firstData.openDate,
@@ -47,7 +45,6 @@ extension MovieDetailData {
         
     }
     static func stub(uuid: String = "" ,
-                     posterURL: String = "",
                      currentRank: String = "",
                      title: String = "",
                      openDate: String = "",
@@ -63,7 +60,6 @@ extension MovieDetailData {
                      ageLimit: String = "",
                      movieCode: String = "") -> Self {
         .init(uuid: uuid,
-              posterURL: posterURL,
               currentRank: currentRank,
               title: title,
               openDate: openDate,

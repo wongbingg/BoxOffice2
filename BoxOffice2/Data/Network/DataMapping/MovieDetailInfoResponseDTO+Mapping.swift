@@ -99,7 +99,6 @@ extension MovieDetailInfoResponseDTO.MovieInfo {
     func toDomain() -> MovieDetailData {
         .init(
             uuid: "",
-            posterURL: "",
             currentRank: "",
             title: "",
             openDate: "",
@@ -110,7 +109,7 @@ extension MovieDetailInfoResponseDTO.MovieInfo {
             openYear: String(openDt.prefix(4)),
             showTime: showTm,
             genreName: genres[0].genreNm,
-            directorName: directors[0].peopleNm,
+            directorName: directors.count == 0 ? "감독 없음" : directors[0].peopleNm,
             actors: actors.map { $0.toDomain() },
             ageLimit: audits[0].toDomain(),
             movieCode: movieCd

@@ -7,4 +7,4 @@
 
 protocol Entity {}
 
-extension String: Entity {}
+
