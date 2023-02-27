@@ -32,7 +32,7 @@ final class ModeSelectCell: UITableViewCell {
     }
     
     func setup(label: String, isChecked: Bool) {
-        boxOfficeLabel.text = label
+        boxOfficeLabel.text = label.localized()
         checkImageView.isHidden = !isChecked
     }
 }

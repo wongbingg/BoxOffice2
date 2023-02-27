@@ -25,7 +25,7 @@ final class HomeViewController: UIViewController {
     private let viewModeChangeButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("▼ 일별 박스오피스", for: .normal)
+        button.setTitle("▼ 일별 박스오피스".localized(), for: .normal)
         button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .callout)
         button.setTitleColor(.secondaryLabel, for: .normal)
         button.backgroundColor = .systemGray5
@@ -89,7 +89,7 @@ final class HomeViewController: UIViewController {
     }
     
     private func setupNavigationBar() {
-        navigationItem.title = "영화목록"
+        navigationItem.title = "영화목록".localized()
         let calendarButton = UIBarButtonItem(
             image: UIImage(systemName: "calendar"),
             style: .done,
@@ -228,7 +228,7 @@ extension HomeViewController: ModeSelectViewControllerDelegate {
         activityIndicator.startAnimating()
         let mode = BoxOfficeMode.allCases[indexPath]
         viewModel.changeViewMode(to: mode)
-        viewModeChangeButton.setTitle("▼ \(viewModel.viewMode.rawValue)", for: .normal)
+        viewModeChangeButton.setTitle("▼ \(viewModel.viewMode.rawValue)".localized(), for: .normal)
         
         if mode == .daily {
             self.homeCollectionView.switchMode(.daily, orientation: currentOrientation)

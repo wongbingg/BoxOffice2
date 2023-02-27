@@ -61,7 +61,7 @@ final class ActorListViewController: UIViewController {
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         navigationBar.isTranslucent = false
         navigationBar.backgroundColor = .systemBackground
-        let naviItem = UINavigationItem(title: "출연진 정보")
+        let naviItem = UINavigationItem(title: "출연진 정보".localized())
         navigationBar.items = [naviItem]
     }
     

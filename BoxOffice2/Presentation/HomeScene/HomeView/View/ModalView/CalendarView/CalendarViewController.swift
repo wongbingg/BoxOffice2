@@ -60,7 +60,7 @@ final class CalendarViewController: UIViewController {
         navigationBar.isTranslucent = false
         navigationBar.backgroundColor = .systemBackground
 
-        let naviItem = UINavigationItem(title: "날짜 선택")
+        let naviItem = UINavigationItem(title: "날짜 선택".localized())
         naviItem.leftBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .close,
             target: self,

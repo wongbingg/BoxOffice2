@@ -18,6 +18,16 @@ extension String {
         guard let number = Int(self) else { return "" }
         return numberFormatter.string(from: NSNumber(integerLiteral: number)) ?? ""
     }
+    
+    func localized(bundle: Bundle = .main,
+                   tableName: String = "Localizable") -> String {
+        return NSLocalizedString(
+            self,
+            tableName: tableName,
+            value: "**\(self)**",
+            comment: ""
+        )
+    }
 }
 
 extension String: Entity {}
