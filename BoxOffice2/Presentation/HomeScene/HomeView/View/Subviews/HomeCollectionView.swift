@@ -8,6 +8,11 @@
 import UIKit
 import RxSwift
 
+enum DeviceOrientation {
+    case landscape
+    case portrait
+}
+
 final class HomeCollectionView: UICollectionView {
 
     private enum Section: String, CaseIterable {
@@ -62,23 +67,33 @@ final class HomeCollectionView: UICollectionView {
         homeDataSource?.apply(snapshot, animatingDifferences: true)
     }
     
-    func switchMode(_ mode: BoxOfficeMode){
+    func switchMode(_ mode: BoxOfficeMode, orientation: DeviceOrientation) {
         if mode == .daily {
-            switchLayout(to: .daily)
-            currentViewMode = .daily
+            switchLayout(to: .daily, orientation: orientation)
             configureDataSource(with: createDailyCellRegistration())
         } else {
-            switchLayout(to: .weekly)
-            currentViewMode = .weekly
+            switchLayout(to: .weekly, orientation: orientation)
             configureDataSource(with: createWeeklyCellRegistration())
         }
     }
     
-    private func switchLayout(to mode: BoxOfficeMode) {
-        if mode == .daily {
-            setCollectionViewLayout(createDailyLayout(), animated: false)
+    func switchLayout(to mode: BoxOfficeMode, orientation: DeviceOrientation) {
+        if orientation == .portrait {
+            if mode == .daily {
+                setCollectionViewLayout(createDailyLayout(), animated: false)
+                currentViewMode = .daily
+            } else {
+                setCollectionViewLayout(createWeeklyLayout(), animated: false)
+                currentViewMode = .weekly
+            }
         } else {
-            setCollectionViewLayout(createWeeklyLayout(), animated: false)
+            if mode == .daily {
+                setCollectionViewLayout(createLandscapeDailyLayout(), animated: false)
+                currentViewMode = .daily
+            } else {
+                setCollectionViewLayout(createLandscapeWeeklyLayout(), animated: false)
+                currentViewMode = .weekly
+            }
         }
     }
 }
@@ -131,6 +146,45 @@ private extension HomeCollectionView {
         return layout
     }
     
+    func createLandscapeDailyLayout() -> UICollectionViewLayout {
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalHeight(1.0)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(
+            top: 0,
+            leading: 10,
+            bottom: 0,
+            trailing: 10
+        )
+        
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalHeight(0.5)
+        )
+        let group = NSCollectionLayoutGroup.vertical(
+            layoutSize: groupSize,
+            subitems: [item]
+        )
+        
+        let section = NSCollectionLayoutSection(group: group)
+        
+        let headerFooterSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(60)
+        )
+        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: headerFooterSize,
+            elementKind: "headerView",
+            alignment: .top
+        )
+        section.boundarySupplementaryItems = [sectionHeader]
+        
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        return layout
+    }
+    
     func createWeeklyLayout() -> UICollectionViewLayout {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
@@ -147,6 +201,45 @@ private extension HomeCollectionView {
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(0.45),
             heightDimension: .fractionalHeight(0.45)
+        )
+        let group = NSCollectionLayoutGroup.horizontal(
+            layoutSize: groupSize,
+            subitems: [item]
+        )
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .continuousGroupLeadingBoundary
+        let headerFooterSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(50)
+        )
+        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: headerFooterSize,
+            elementKind: "headerView",
+            alignment: .top
+        )
+        section.boundarySupplementaryItems = [sectionHeader]
+        
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        return layout
+    }
+    
+    func createLandscapeWeeklyLayout() -> UICollectionViewLayout {
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalHeight(1.0)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(
+            top: 0,
+            leading: 10,
+            bottom: 0,
+            trailing: 10
+        )
+        
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(0.23),
+            heightDimension: .fractionalHeight(1)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
