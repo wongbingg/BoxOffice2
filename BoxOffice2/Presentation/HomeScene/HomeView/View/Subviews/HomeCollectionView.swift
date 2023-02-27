@@ -311,7 +311,7 @@ private extension HomeCollectionView {
                 guard self.currentDate != "" else { return }
                 supplementaryView.sectionHeaderlabel.text = self.currentDate
             } else {
-                supplementaryView.sectionHeaderlabel.text = Section.allCases[indexPath.section].rawValue
+                supplementaryView.sectionHeaderlabel.text = Section.allCases[indexPath.section].rawValue.localized()
             }
         }
         return headerRegistration

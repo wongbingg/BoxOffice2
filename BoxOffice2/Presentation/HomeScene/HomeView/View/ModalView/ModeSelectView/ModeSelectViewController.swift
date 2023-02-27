@@ -58,7 +58,7 @@ final class ModeSelectViewController: UIViewController {
         navigationBar.isTranslucent = false
         navigationBar.backgroundColor = .systemBackground
 
-        let naviItem = UINavigationItem(title: "보기 모드")
+        let naviItem = UINavigationItem(title: "보기 모드".localized())
         naviItem.leftBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .close,
             target: self,
