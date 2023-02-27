@@ -36,7 +36,7 @@ final class MovieSubInfoView: UIView {
     private let moreActorsButton: UIButton = {
         let button = UIButton()
         button.setTitle("더보기", for: .normal)
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(.secondaryLabel, for: .normal)
         button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         button.setContentCompressionResistancePriority(UILayoutPriority(1000), for: .horizontal)
         button.translatesAutoresizingMaskIntoConstraints = false
