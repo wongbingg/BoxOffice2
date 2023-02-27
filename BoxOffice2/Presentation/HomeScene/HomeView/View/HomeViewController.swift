@@ -8,11 +8,9 @@
 import UIKit
 import RxSwift
 
-
-
 final class HomeViewController: UIViewController {
     private let disposeBag = DisposeBag()
-    private let homeCollectionView = HomeCollectionView()
+    private let homeCollectionView: HomeCollectionView
     private let viewModel: HomeViewModel
     private var searchingDate: Date = Date().previousDate(to: -7)
     
@@ -37,8 +35,15 @@ final class HomeViewController: UIViewController {
     }()
     
     // MARK: Initializers
-    init(with viewModel: HomeViewModel) {
+    init(
+        with viewModel: HomeViewModel,
+        posterImageRepository: PosterImageRepository
+    ) {
         self.viewModel = viewModel
+        self.homeCollectionView = HomeCollectionView(
+            viewModel: viewModel,
+            posterImageRepository: posterImageRepository
+        )
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -53,8 +58,13 @@ final class HomeViewController: UIViewController {
         setupNavigationBar()
         setupCollectionView()
         setupButton()
-        requestDailyBoxOffice()
+        
+        bindDailyBoxOffice()
+        bindAllWeeksBoxOffice()
+        bindWeekEndBoxOffice()
+        
         activityIndicator.startAnimating()
+        viewModel.requestDailyData(with: searchingDate.toString())
     }
     
     // MARK: Methods
@@ -94,41 +104,41 @@ final class HomeViewController: UIViewController {
         )
     }
     
-    private func requestDailyBoxOffice() {
-        viewModel.requestDailyData(with: searchingDate.toString())
+    private func bindDailyBoxOffice() {
+        viewModel.dailyBoxOffices
             .observe(on: MainScheduler.instance)
             .subscribe { [self] movieCellDatas in
-                homeCollectionView.appendDailySnapshot(with: movieCellDatas)
-                activityIndicator.stopAnimating()
+                homeCollectionView.appendDailySnapshot(with: movieCellDatas.map { $0.uuid })
+                self.activityIndicator.stopAnimating()
             } onError: { error in
                 print(error.localizedDescription)
-                //alert
+            } onCompleted: {
             }
             .disposed(by: disposeBag)
     }
     
-    private func requestAllWeeksBoxOffice() {
-        viewModel.requestAllWeekData(with: searchingDate.toString())
+    private func bindAllWeeksBoxOffice() {
+        viewModel.allWeekBoxOffices
             .observe(on: MainScheduler.instance)
             .subscribe { [self] movieCellDatas in
-                homeCollectionView.appendAllWeekSnapshot(with: movieCellDatas)
-                activityIndicator.stopAnimating()
+                homeCollectionView.appendAllWeekSnapshot(with: movieCellDatas.map { $0.uuid })
+                self.activityIndicator.stopAnimating()
             } onError: { error in
                 print(error.localizedDescription)
-                //alert
+            } onCompleted: {
             }
             .disposed(by: disposeBag)
     }
     
-    private func requestWeekEndBoxOffice() {
-        viewModel.requestWeekEndData(with: searchingDate.toString())
+    private func bindWeekEndBoxOffice() {
+        viewModel.weekEndBoxOffices
             .observe(on: MainScheduler.instance)
             .subscribe { [self] movieCellDatas in
-                homeCollectionView.appendWeekEndSnapshot(with: movieCellDatas)
-                activityIndicator.stopAnimating()
+                homeCollectionView.appendWeekEndSnapshot(with: movieCellDatas.map { $0.uuid })
+                self.activityIndicator.stopAnimating()
             } onError: { error in
                 print(error.localizedDescription)
-                //alert
+            } onCompleted: {
             }
             .disposed(by: disposeBag)
     }
@@ -180,16 +190,16 @@ extension HomeViewController: ModeSelectViewControllerDelegate {
         
         if mode == .daily {
             self.homeCollectionView.switchMode(.daily)
-            requestDailyBoxOffice()
+            viewModel.requestDailyData(with: searchingDate.toString())
         } else {
             self.homeCollectionView.switchMode(.weekly)
-            requestAllWeeksBoxOffice()
-            requestWeekEndBoxOffice()
+            viewModel.requestAllWeekData(with: searchingDate.toString())
+            viewModel.requestWeekEndData(with: searchingDate.toString())
         }
     }
 }
 
-// MARK: - CalendarViewControllerDelegate
+// MARK: - CalendarViewController Delegate
 extension HomeViewController: CalendarViewControllerDelegate {
     
     func searchButtonTapped(date: Date) {
@@ -200,11 +210,11 @@ extension HomeViewController: CalendarViewControllerDelegate {
         
         if viewModeChangeButton.title(for: .normal) == "▼ 일별 박스오피스" {
             self.homeCollectionView.switchMode(.daily)
-            requestDailyBoxOffice()
+            viewModel.requestDailyData(with: searchingDate.toString())
         } else {
             self.homeCollectionView.switchMode(.weekly)
-            requestAllWeeksBoxOffice()
-            requestWeekEndBoxOffice()
+            viewModel.requestAllWeekData(with: searchingDate.toString())
+            viewModel.requestWeekEndData(with: searchingDate.toString())
         }
     }
 }
