@@ -16,6 +16,7 @@ struct APIClient {
         
         return Observable.create { emitter in
             let task = session.dataTask(with: urlRequest) { data, response, error in
+
                 guard error == nil else {
                     emitter.onError(APIError.unknown)
                     return
@@ -24,10 +25,14 @@ struct APIClient {
                 if let statusCode = (response as? HTTPURLResponse)?.statusCode,
                       successRange.contains(statusCode) == false {
                     emitter.onError(APIError.response(statusCode))
-                } else if let data = data {
-                    emitter.onNext(data)
-                    emitter.onCompleted()
+                    return
                 }
+                guard let data = data else {
+                    emitter.onError(APIError.unknown)
+                    return
+                }
+                emitter.onNext(data)
+                emitter.onCompleted()
             }
             task.resume()
             

@@ -21,7 +21,7 @@ extension API {
         }
         
         return Observable<ResponseType>.create { emitter in
-            let task = client.requestData(with: urlRequest)
+            client.requestData(with: urlRequest)
                 .subscribe { data in
                     do {
                         let result = try JSONDecoder().decode(ResponseType.self, from: data)
@@ -34,7 +34,6 @@ extension API {
                 } onCompleted: {
                     emitter.onCompleted()
                 }
-            return task
         }
     }
 }
