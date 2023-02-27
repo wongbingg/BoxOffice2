@@ -7,6 +7,7 @@
 
 import Foundation
 import RxSwift
+import RxRelay
 
 enum BoxOfficeMode: String, CaseIterable {
     case daily = "일별 박스오피스"
@@ -18,19 +19,19 @@ struct HomeViewModelActions {
 }
 
 protocol HomeViewModelInput {
-    func requestDailyData(with date: String) -> Observable<[MovieCellData]>
-    func requestAllWeekData(with date: String) -> Observable<[MovieCellData]>
-    func requestWeekEndData(with date: String) -> Observable<[MovieCellData]>
+    func requestDailyData(with date: String)
+    func requestAllWeekData(with date: String)
+    func requestWeekEndData(with date: String)
     
     func movieTapped(at indexPath: IndexPath)
     func changeViewMode(to mode: BoxOfficeMode)
 }
 
 protocol HomeViewModelOutput{
-    var dailyBoxOffices: [MovieCellData] { get }
-    var allWeekBoxOffices: [MovieCellData] { get }
-    var weekEndBoxOffices: [MovieCellData] { get }
     var viewMode: BoxOfficeMode { get }
+    var dailyBoxOffices: BehaviorRelay<[MovieCellData]> { get }
+    var allWeekBoxOffices: BehaviorRelay<[MovieCellData]> { get }
+    var weekEndBoxOffices: BehaviorRelay<[MovieCellData]> { get }
 }
 
 protocol HomeViewModel: HomeViewModelInput, HomeViewModelOutput {}
@@ -38,9 +39,9 @@ protocol HomeViewModel: HomeViewModelInput, HomeViewModelOutput {}
 final class DefaultHomeViewModel: HomeViewModel {
     // MARK: Output
     private(set) var viewMode: BoxOfficeMode = .daily
-    private(set) var dailyBoxOffices: [MovieCellData] = []
-    private(set) var allWeekBoxOffices: [MovieCellData] = []
-    private(set) var weekEndBoxOffices: [MovieCellData] = []
+    private(set) var dailyBoxOffices: BehaviorRelay<[MovieCellData]> = .init(value: [])
+    private(set) var allWeekBoxOffices: BehaviorRelay<[MovieCellData]> = .init(value: [])
+    private(set) var weekEndBoxOffices: BehaviorRelay<[MovieCellData]> = .init(value: [])
     
     private let disposeBag = DisposeBag()
     private let actions: HomeViewModelActions?
@@ -60,62 +61,64 @@ final class DefaultHomeViewModel: HomeViewModel {
         self.searchWeekEndBoxOfficeUseCase = searchWeekEndBoxOfficeUseCase
     }
     
-    func requestDailyData(with date: String) -> Observable<[MovieCellData]> {
-        
-        return Observable.create { [self] emitter in
-            searchDailyBoxOfficeUseCase.execute(date: date)
-                .subscribe { movieCellDatas in
-                    self.dailyBoxOffices = movieCellDatas
-                    emitter.onNext(movieCellDatas)
-                    emitter.onCompleted()
-                } onError: { error in
-                    emitter.onError(error)
-                }.disposed(by: disposeBag)
-            return Disposables.create()
-        }
+    // MARK: Input
+    func requestDailyData(with date: String) {
+        searchDailyBoxOfficeUseCase.execute(date: date)
+            .subscribe { movieCellDatas in
+                self.dailyBoxOffices.accept(movieCellDatas)
+            } onError: { error in
+                print(error.localizedDescription)
+            }
+            .disposed(by: disposeBag)
     }
     
-    func requestAllWeekData(with date: String) -> Observable<[MovieCellData]> {
-        
-        return Observable.create { [self] emitter in
-            searchWeekDaysBoxOfficeUseCase.execute(date: date)
-                .subscribe { movieCellDatas in
-                    self.allWeekBoxOffices = movieCellDatas
-                    emitter.onNext(movieCellDatas)
-                    emitter.onCompleted()
-                } onError: { error in
-                    emitter.onError(error)
-                }.disposed(by: disposeBag)
-            return Disposables.create()
-        }
+    func requestAllWeekData(with date: String) {
+        searchDailyBoxOfficeUseCase.execute(date: date)
+            .subscribe { movieCellDatas in
+                self.allWeekBoxOffices.accept(movieCellDatas)
+            } onError: { error in
+                print(error.localizedDescription)
+            }
+            .disposed(by: disposeBag)
     }
     
-    func requestWeekEndData(with date: String) -> Observable<[MovieCellData]> {
-        
-        return Observable.create { [self] emitter in
-            searchWeekEndBoxOfficeUseCase.execute(date: date)
-                .subscribe { movieCellDatas in
-                    self.weekEndBoxOffices = movieCellDatas
-                    emitter.onNext(movieCellDatas)
-                    emitter.onCompleted()
-                } onError: { error in
-                    emitter.onError(error)
-                }.disposed(by: disposeBag)
-            return Disposables.create()
-        }
+    func requestWeekEndData(with date: String) {
+        searchDailyBoxOfficeUseCase.execute(date: date)
+            .subscribe { movieCellDatas in
+                self.weekEndBoxOffices.accept(movieCellDatas)
+            } onError: { error in
+                print(error.localizedDescription)
+            }
+            .disposed(by: disposeBag)
     }
     
     func movieTapped(at indexPath: IndexPath) {
         if viewMode == .daily {
-            let movie = dailyBoxOffices[indexPath.row]
-            actions?.showMovieDetail(movie)
+            dailyBoxOffices.subscribe { movieCellDatas in
+                let movie = movieCellDatas[indexPath.row]
+                self.actions?.showMovieDetail(movie)
+            } onError: { error in
+                print(error.localizedDescription)
+            }
+            .disposed(by: disposeBag)
         } else {
+            
             if indexPath.section == 0 {
-                let movie = allWeekBoxOffices[indexPath.row]
-                actions?.showMovieDetail(movie)
+                allWeekBoxOffices.subscribe { movieCellDatas in
+                    let movie = movieCellDatas[indexPath.row]
+                    self.actions?.showMovieDetail(movie)
+                } onError: { error in
+                    print(error.localizedDescription)
+                }
+                .disposed(by: disposeBag)
             } else {
-                let movie = weekEndBoxOffices[indexPath.row]
-                actions?.showMovieDetail(movie)
+                weekEndBoxOffices.subscribe { movieCellDatas in
+                    let movie = movieCellDatas[indexPath.row]
+                    self.actions?.showMovieDetail(movie)
+                } onError: { error in
+                    print(error.localizedDescription)
+                }
+                .disposed(by: disposeBag)
             }
         }
     }
