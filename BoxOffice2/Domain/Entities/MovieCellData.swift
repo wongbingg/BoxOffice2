@@ -5,9 +5,8 @@
 //  Created by 이원빈 on 2023/02/23.
 //
 
-struct MovieCellData: Entity {
+struct MovieCellData: Entity, Hashable {
     let uuid: String
-    var posterURL: String
     let currentRank: String
     let title: String
     let openDate: String
@@ -15,9 +14,25 @@ struct MovieCellData: Entity {
     let rankChange: String
     let isNewEntry: Bool
     let movieCode: String
-    
-    mutating func setPosterURL(with url: String) {
-        posterURL = url
+}
+
+extension MovieCellData {
+    static func stub(uuid: String = "",
+                     currentRank: String = "",
+                     title: String = "",
+                     openDate: String = "",
+                     totalAudience: String = "",
+                     rankChange: String = "",
+                     isNewEntry: Bool = false,
+                     movieCode: String = "") -> Self {
+        .init(uuid: uuid,
+              currentRank: currentRank,
+              title: title,
+              openDate: openDate,
+              totalAudience: totalAudience,
+              rankChange: rankChange,
+              isNewEntry: isNewEntry,
+              movieCode: movieCode)
     }
 }
 

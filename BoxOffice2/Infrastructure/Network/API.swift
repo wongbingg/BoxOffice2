@@ -21,21 +21,19 @@ extension API {
         }
         
         return Observable<ResponseType>.create { emitter in
-            let task = client.requestData(with: urlRequest)
+            client.requestData(with: urlRequest)
                 .subscribe { data in
                     do {
                         let result = try JSONDecoder().decode(ResponseType.self, from: data)
                         emitter.onNext(result)
-                        emitter.onCompleted()
                     } catch let error {
                         emitter.onError(error)
                     }
                 } onError: { error in
-                    print(error.localizedDescription)
+                    emitter.onError(error)
                 } onCompleted: {
-                    print("completed")
+                    emitter.onCompleted()
                 }
-            return task
         }
     }
 }

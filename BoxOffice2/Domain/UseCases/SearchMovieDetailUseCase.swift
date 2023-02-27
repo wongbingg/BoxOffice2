@@ -12,6 +12,7 @@ protocol SearchMovieDetailUseCase {
 }
 
 struct DefaultSearchMovieDetailUseCase: SearchMovieDetailUseCase {
+    private let disposeBag = DisposeBag()
     let movieRepository: MovieRepository
     
     func execute(movie: MovieCellData) -> Observable<MovieDetailData> {
