@@ -13,13 +13,21 @@ final class HomeViewController: UIViewController {
     private let homeCollectionView: HomeCollectionView
     private let viewModel: HomeViewModel
     private var searchingDate: Date = Date().previousDate(to: -7)
+    private var currentOrientation: DeviceOrientation {
+        if (UIDevice.current.orientation == .portrait) ||
+            (UIDevice.current.orientation == .portraitUpsideDown) {
+            return .portrait
+        } else {
+            return .landscape
+        }
+    }
     
     private let viewModeChangeButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("▼ 일별 박스오피스", for: .normal)
         button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .callout)
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(.secondaryLabel, for: .normal)
         button.backgroundColor = .systemGray5
         button.contentHorizontalAlignment = .left
         return button
@@ -58,6 +66,7 @@ final class HomeViewController: UIViewController {
         setupNavigationBar()
         setupCollectionView()
         setupButton()
+        addDeviceOrientationNoti()
         
         bindDailyBoxOffice()
         bindAllWeeksBoxOffice()
@@ -65,6 +74,11 @@ final class HomeViewController: UIViewController {
         
         activityIndicator.startAnimating()
         viewModel.requestDailyData(with: searchingDate.toString())
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        removeDeviceOrientationNoti()
     }
     
     // MARK: Methods
@@ -86,7 +100,7 @@ final class HomeViewController: UIViewController {
     }
     
     private func setupCollectionView() {
-        homeCollectionView.currentDate = searchingDate.toString()
+        homeCollectionView.currentDate = searchingDate.toSectionHeaderString()
         homeCollectionView.translatesAutoresizingMaskIntoConstraints = false
         homeCollectionView.delegate = self
         homeCollectionView.register(
@@ -102,6 +116,19 @@ final class HomeViewController: UIViewController {
             action: #selector(viewModeChangeButtonTapped),
             for: .touchUpInside
         )
+    }
+    
+    private func addDeviceOrientationNoti() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(detectOrientation),
+            name: NSNotification.Name("UIDeviceOrientationDidChangeNotification"),
+            object: nil
+        )
+    }
+    
+    private func removeDeviceOrientationNoti() {
+        NotificationCenter.default.removeObserver(NSNotification.Name("UIDeviceOrientationDidChangeNotification"))
     }
     
     private func bindDailyBoxOffice() {
@@ -158,6 +185,21 @@ final class HomeViewController: UIViewController {
         
         present(calendarViewController, animated: true)
     }
+    
+    @objc private func detectOrientation() {
+        if (UIDevice.current.orientation == .landscapeLeft) ||
+            (UIDevice.current.orientation == .landscapeRight) {
+            homeCollectionView.switchLayout(
+                to: viewModel.viewMode,
+                orientation: .landscape
+            )
+        } else if (UIDevice.current.orientation == .portrait) {
+            homeCollectionView.switchLayout(
+                to: viewModel.viewMode,
+                orientation: .portrait
+            )
+        }
+    }
 }
 
 // MARK: - UICollectionView Delegate
@@ -189,10 +231,10 @@ extension HomeViewController: ModeSelectViewControllerDelegate {
         viewModeChangeButton.setTitle("▼ \(viewModel.viewMode.rawValue)", for: .normal)
         
         if mode == .daily {
-            self.homeCollectionView.switchMode(.daily)
+            self.homeCollectionView.switchMode(.daily, orientation: currentOrientation)
             viewModel.requestDailyData(with: searchingDate.toString())
         } else {
-            self.homeCollectionView.switchMode(.weekly)
+            self.homeCollectionView.switchMode(.weekly, orientation: currentOrientation)
             viewModel.requestAllWeekData(with: searchingDate.toString())
             viewModel.requestWeekEndData(with: searchingDate.toString())
         }
@@ -205,14 +247,14 @@ extension HomeViewController: CalendarViewControllerDelegate {
     func searchButtonTapped(date: Date) {
         activityIndicator.startAnimating()
         searchingDate = date
-        let dateText = date.toString()
+        let dateText = date.toSectionHeaderString()
         homeCollectionView.currentDate = dateText
         
         if viewModeChangeButton.title(for: .normal) == "▼ 일별 박스오피스" {
-            self.homeCollectionView.switchMode(.daily)
+            self.homeCollectionView.switchMode(.daily, orientation: currentOrientation)
             viewModel.requestDailyData(with: searchingDate.toString())
         } else {
-            self.homeCollectionView.switchMode(.weekly)
+            self.homeCollectionView.switchMode(.weekly, orientation: currentOrientation)
             viewModel.requestAllWeekData(with: searchingDate.toString())
             viewModel.requestWeekEndData(with: searchingDate.toString())
         }
