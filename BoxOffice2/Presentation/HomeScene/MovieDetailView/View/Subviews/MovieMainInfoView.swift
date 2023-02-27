@@ -9,8 +9,17 @@ import UIKit
 import RxSwift
 
 final class MovieMainInfoView: UIView {
-    private let imageCacheManager = DefaultImageCacheManager()
+    private var posterImageRepository: PosterImageRepository?
     private let disposeBag = DisposeBag()
+    
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(frame: .zero)
+        indicator.tintColor = .systemBlue
+        indicator.style = .medium
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
     
     private let rankStackView: UIStackView = {
         let stackView = UIStackView()
@@ -54,7 +63,7 @@ final class MovieMainInfoView: UIView {
         return stackView
     }()
     
-    private let posterView: UIImageView = {
+    private let posterImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .systemGray6
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -123,7 +132,13 @@ final class MovieMainInfoView: UIView {
         separator.close()
     }
     
-    func configure(with movie: MovieDetailData, rating: String) {
+    func configure(
+        with movie: MovieDetailData,
+        rating: String,
+        repository: PosterImageRepository
+    ) {
+        activityIndicator.startAnimating()
+        posterImageRepository = repository
         ratingLabel.text = rating == "nan" ? "정보 없음" : rating
         titleLabel.text = movie.title
         currentRanklabel.text = movie.currentRank
@@ -131,7 +146,6 @@ final class MovieMainInfoView: UIView {
         setIsNewEntryLabel(with: movie.isNewEntry)
         openYearLabel.text = movie.openYear + " • "
         genreLabel.text = movie.genreName
-//        setupPosterImage(with: movie.posterURL)
         
         setPosterImageView(with: movie.title)
     }
@@ -168,44 +182,25 @@ final class MovieMainInfoView: UIView {
     
     private func setPosterImageView(with title: String){
         
-        SearchMoviePosterAPI(movieTitle: title).execute()
+        posterImageRepository?.fetchPosterImage(with: title, year: nil)
             .observe(on: MainScheduler.instance)
-            .subscribe { [self] response in
-                let url = response.toDomain()
-                guard let url = URL(string: url) else {
-                    return
-                }
-                
-                imageCacheManager.getImage(with: url)
-                    .observe(on: MainScheduler.instance)
-                    .subscribe { image in
-                        guard let image = image else { return }
-                        self.posterView.image = image
-                        
-                    } onError: { error in
-                        print(error.localizedDescription)
-                    }
-                    .disposed(by: disposeBag)
-                
-            } onError: { error in
-                print(error.localizedDescription)
-            }
-            .disposed(by: self.disposeBag)
-    }
-    
-    private func setupPosterImage(with url: String) {//
-        guard let validUrl = URL(string: url) else {
-            // 기본이미지
-            return
-        }
-        imageCacheManager.getImage(with: validUrl)
-            .subscribe { [self] image in
+            .subscribe { image in
                 guard let image = image else { return }
-                posterView.image = image
+                self.posterImageView.image = image
             } onError: { error in
+                self.activityIndicator.stopAnimating()
                 print(error.localizedDescription)
+            } onCompleted: {
+                self.activityIndicator.stopAnimating()
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func setDefaultImage() {
+        let noSignImage = UIImage(systemName: "nosign")
+        self.posterImageView.image = noSignImage
+        self.posterImageView.contentMode = .scaleAspectFit
+        self.posterImageView.backgroundColor = .systemGray4
     }
 }
 
@@ -227,7 +222,8 @@ private extension MovieMainInfoView {
         infoStackView.addArrangedSubview(openYearStackView)
         infoStackView.addArrangedSubview(ratingStackView)
         
-        entireStackView.addArrangedSubview(posterView)
+        entireStackView.addArrangedSubview(posterImageView)
+        posterImageView.addSubview(activityIndicator)
         entireStackView.addArrangedSubview(infoStackView)
         
         self.addSubview(entireStackView)
@@ -240,9 +236,9 @@ private extension MovieMainInfoView {
             currentRanklabel.centerXAnchor.constraint(equalTo: rankBackgroundView.centerXAnchor),
             currentRanklabel.centerYAnchor.constraint(equalTo: rankBackgroundView.centerYAnchor),
             
-            rankBackgroundView.topAnchor.constraint(equalTo: posterView.topAnchor),
-            rankBackgroundView.leadingAnchor.constraint(equalTo: posterView.leadingAnchor),
-            rankBackgroundView.widthAnchor.constraint(equalTo: posterView.widthAnchor, multiplier: 0.2),
+            rankBackgroundView.topAnchor.constraint(equalTo: posterImageView.topAnchor),
+            rankBackgroundView.leadingAnchor.constraint(equalTo: posterImageView.leadingAnchor),
+            rankBackgroundView.widthAnchor.constraint(equalTo: posterImageView.widthAnchor, multiplier: 0.2),
             rankBackgroundView.heightAnchor.constraint(equalTo: rankBackgroundView.widthAnchor),
             
             entireStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor,
@@ -254,8 +250,10 @@ private extension MovieMainInfoView {
             entireStackView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor,
                                                       constant: -16),
             
-            posterView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor,
+            posterImageView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor,
                                               multiplier: 4/10),
+            activityIndicator.centerXAnchor.constraint(equalTo: posterImageView.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: posterImageView.centerYAnchor),
             starView.widthAnchor.constraint(equalTo: starView.heightAnchor)
         ])
     }
