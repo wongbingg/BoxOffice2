@@ -26,6 +26,7 @@ final class ListCell: UICollectionViewCell, MovieCellProtocol {
         imageView.contentMode = .scaleAspectFit
         imageView.tintColor = .systemGray3
         imageView.clipsToBounds = true
+        imageView.setContentHuggingPriority(.required, for: .horizontal)
         return imageView
     }()
     
@@ -178,7 +179,6 @@ private extension ListCell {
     private func setDefaultImage() {
         let noSignImage = UIImage(systemName: "nosign")
         self.posterImageView.image = noSignImage
-        self.posterImageView.contentMode = .scaleAspectFit
     }
     
     private func setOpenDateLabel(with openDate: String) {
@@ -213,7 +213,7 @@ private extension ListCell {
 // MARK:  - Setup Layout
 private extension ListCell {
     func addSubViews() {
-        addSubview(mainStackView)
+        contentView.addSubview(mainStackView)
         mainStackView.addArrangedSubview(posterImageView)
         posterImageView.addSubview(activityIndicator)
         mainStackView.addArrangedSubview(rankLabel)
@@ -229,13 +229,15 @@ private extension ListCell {
     
     func setupLayout() {
         NSLayoutConstraint.activate([
-            mainStackView.topAnchor.constraint(equalTo: topAnchor),
-            mainStackView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            mainStackView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            mainStackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            mainStackView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            mainStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            mainStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            mainStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
-            posterImageView.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width*0.25),
-            posterImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            posterImageView.widthAnchor.constraint(
+                equalToConstant: [UIScreen.main.bounds.width, UIScreen.main.bounds.height].min()!*0.25
+            ),
+            posterImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
             activityIndicator.centerXAnchor.constraint(equalTo: posterImageView.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: posterImageView.centerYAnchor)
