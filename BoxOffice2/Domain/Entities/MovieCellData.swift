@@ -16,4 +16,24 @@ struct MovieCellData: Entity, Hashable {
     let movieCode: String
 }
 
+extension MovieCellData {
+    static func stub(uuid: String = "",
+                     currentRank: String = "",
+                     title: String = "",
+                     openDate: String = "",
+                     totalAudience: String = "",
+                     rankChange: String = "",
+                     isNewEntry: Bool = false,
+                     movieCode: String = "") -> Self {
+        .init(uuid: uuid,
+              currentRank: currentRank,
+              title: title,
+              openDate: openDate,
+              totalAudience: totalAudience,
+              rankChange: rankChange,
+              isNewEntry: isNewEntry,
+              movieCode: movieCode)
+    }
+}
+
 extension Array<MovieCellData>: Entity {}
