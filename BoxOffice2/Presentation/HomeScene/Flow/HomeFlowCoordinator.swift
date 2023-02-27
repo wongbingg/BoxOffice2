@@ -34,12 +34,14 @@ final class HomeFlowCoordinator {
     
     // MARK: - View Transition
     private func showMovieDetail(with movieCellData: MovieCellData) {
-        // 다음씬 생성 후 이동
-        let actions = MovieDetailViewModelActions()
-        let movieDetailVC = dependencies.makeMovieDetailViewController(
-            actions: actions,
-            movieCellData: movieCellData
-        )
-        navigationController.pushViewController(movieDetailVC, animated: true)
+        
+        DispatchQueue.main.async {
+            let actions = MovieDetailViewModelActions()
+            let movieDetailVC = self.dependencies.makeMovieDetailViewController(
+                actions: actions,
+                movieCellData: movieCellData
+            )
+            self.navigationController.pushViewController(movieDetailVC, animated: true)
+        }
     }
 }
