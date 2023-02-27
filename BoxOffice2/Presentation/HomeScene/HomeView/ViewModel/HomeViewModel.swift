@@ -73,7 +73,7 @@ final class DefaultHomeViewModel: HomeViewModel {
     }
     
     func requestAllWeekData(with date: String) {
-        searchDailyBoxOfficeUseCase.execute(date: date)
+        searchWeekDaysBoxOfficeUseCase.execute(date: date)
             .subscribe { movieCellDatas in
                 self.allWeekBoxOffices.accept(movieCellDatas)
             } onError: { error in
@@ -83,7 +83,7 @@ final class DefaultHomeViewModel: HomeViewModel {
     }
     
     func requestWeekEndData(with date: String) {
-        searchDailyBoxOfficeUseCase.execute(date: date)
+        searchWeekEndBoxOfficeUseCase.execute(date: date)
             .subscribe { movieCellDatas in
                 self.weekEndBoxOffices.accept(movieCellDatas)
             } onError: { error in
