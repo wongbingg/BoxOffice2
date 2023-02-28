@@ -56,6 +56,7 @@ final class ListCell: UICollectionViewCell, MovieCellProtocol {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .largeTitle)
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -64,6 +65,7 @@ final class ListCell: UICollectionViewCell, MovieCellProtocol {
         label.font = UIFont.preferredFont(forTextStyle: .title2)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 2
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -88,6 +90,7 @@ final class ListCell: UICollectionViewCell, MovieCellProtocol {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.preferredFont(forTextStyle: .footnote)
+        label.adjustsFontForContentSizeCategory = true
         label.layer.backgroundColor = UIColor.systemGreen.cgColor
         label.layer.cornerRadius = 5
         return label
@@ -97,6 +100,7 @@ final class ListCell: UICollectionViewCell, MovieCellProtocol {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.preferredFont(forTextStyle: .footnote)
+        label.adjustsFontForContentSizeCategory = true
         label.layer.backgroundColor = UIColor.systemYellow.cgColor
         label.layer.cornerRadius = 5
         return label
@@ -105,16 +109,18 @@ final class ListCell: UICollectionViewCell, MovieCellProtocol {
     private let totalAudiencesCountLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .systemGray
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .callout)
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
     private let openDateLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .systemGray
+        label.textColor = .secondaryLabel
         label.font = UIFont.preferredFont(forTextStyle: .callout)
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     

@@ -51,6 +51,7 @@ final class GridCell: UICollectionViewCell, MovieCellProtocol {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .title2)
+        label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 1
         label.setContentHuggingPriority(UILayoutPriority(100), for: .vertical)
@@ -69,6 +70,7 @@ final class GridCell: UICollectionViewCell, MovieCellProtocol {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.preferredFont(forTextStyle: .footnote)
+        label.adjustsFontForContentSizeCategory = true
         label.layer.backgroundColor = UIColor.systemGreen.cgColor
         label.layer.cornerRadius = 5
         return label
@@ -78,6 +80,7 @@ final class GridCell: UICollectionViewCell, MovieCellProtocol {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.preferredFont(forTextStyle: .footnote)
+        label.adjustsFontForContentSizeCategory = true
         label.layer.backgroundColor = UIColor.systemYellow.cgColor
         label.layer.cornerRadius = 5
         return label
@@ -88,6 +91,7 @@ final class GridCell: UICollectionViewCell, MovieCellProtocol {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .systemGray
         label.font = UIFont.preferredFont(forTextStyle: .callout)
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -96,6 +100,7 @@ final class GridCell: UICollectionViewCell, MovieCellProtocol {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .systemGray
         label.font = UIFont.preferredFont(forTextStyle: .callout)
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -116,7 +121,13 @@ final class GridCell: UICollectionViewCell, MovieCellProtocol {
         return view
     }()
     
-    private let currentRanklabel = MovieLabel(font: .largeTitle, isBold: true)
+    private let currentRanklabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(for: .largeTitle, weight: .bold)
+        label.adjustsFontForContentSizeCategory = true
+        return label
+    }()
     
     // MARK: Initializers
     override init(frame: CGRect) {

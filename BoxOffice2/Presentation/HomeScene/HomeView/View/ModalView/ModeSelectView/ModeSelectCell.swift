@@ -8,9 +8,13 @@
 import UIKit
 
 final class ModeSelectCell: UITableViewCell {
+    
     private let boxOfficeLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.adjustsFontForContentSizeCategory = true
+        label.accessibilityTraits = .button
         return label
     }()
     

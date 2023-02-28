@@ -27,9 +27,11 @@ final class HomeViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("▼ 일별 박스오피스".localized(), for: .normal)
         button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .callout)
+        button.titleLabel?.adjustsFontForContentSizeCategory = true
         button.setTitleColor(.secondaryLabel, for: .normal)
         button.backgroundColor = .systemGray5
         button.contentHorizontalAlignment = .left
+        button.accessibilityLabel = "보기모드 변경하기"
         return button
     }()
     
