@@ -5,6 +5,7 @@
 ## 프로젝트 소개
 박스오피스를 일별, 주중/주말 순위 로 구분해서 볼 수 있는 앱 입니다.
 
+
 ## 📑 목차
 
 - [🔑 핵심기술](#🔑-핵심기술)
@@ -216,6 +217,11 @@ func createWeeklyLayout() -> UICollectionViewLayout {
 
 - 시력이 좋지 않은 사용자를 위해 Dynamic Type을 적용 했습니다. 
 - 시각 장애인 사용자를 위해 Voice Over를 적용 했습니다.
+
+|일별 박스오피스 화면|주간/주말 박스오피스 화면|
+|:---:|:---:|
+|<img src="https://i.imgur.com/406ZobP.gif" width="150">|<img src="https://i.imgur.com/GIrP7Ni.gif" width="150">|
+
 
 ### ✅ Unit Test
 
