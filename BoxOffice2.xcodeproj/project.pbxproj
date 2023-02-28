@@ -42,6 +42,7 @@
 		AF54F25729A7A66200A2BC48 /* DTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF54F25629A7A66200A2BC48 /* DTO.swift */; };
 		AF54F25929A7A6B300A2BC48 /* Entity.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF54F25829A7A6B300A2BC48 /* Entity.swift */; };
 		AF58927429ACED6A00AFAF91 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AF58927629ACED6A00AFAF91 /* Localizable.strings */; };
+		AF58927C29AD7B6000AFAF91 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF58927B29AD7B6000AFAF91 /* UIFont+Extension.swift */; };
 		AF86FB1C29AA402F00587221 /* MovieDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF86FB1B29AA402F00587221 /* MovieDetailViewController.swift */; };
 		AF86FB2029AA40F300587221 /* MovieDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF86FB1F29AA40F300587221 /* MovieDetailViewModel.swift */; };
 		AF86FB2529AA418200587221 /* ActorListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF86FB2429AA418200587221 /* ActorListViewController.swift */; };
@@ -141,6 +142,7 @@
 		AF58927829ACEDB400AFAF91 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		AF58927929ACEDC100AFAF91 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		AF58927A29ACEDC100AFAF91 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		AF58927B29AD7B6000AFAF91 /* UIFont+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
 		AF86FB1B29AA402F00587221 /* MovieDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailViewController.swift; sourceTree = "<group>"; };
 		AF86FB1F29AA40F300587221 /* MovieDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailViewModel.swift; sourceTree = "<group>"; };
 		AF86FB2429AA418200587221 /* ActorListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActorListViewController.swift; sourceTree = "<group>"; };
@@ -552,6 +554,7 @@
 			isa = PBXGroup;
 			children = (
 				AFE03B2429AB6AFA00E77210 /* String+Extension.swift */,
+				AF58927B29AD7B6000AFAF91 /* UIFont+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -799,6 +802,7 @@
 				AFADB8BC29A8472A009D2EBA /* AppFlowCoordinator.swift in Sources */,
 				AF51F6EF29A71F5C007A5A87 /* SearchDailyBoxOfficeUseCase.swift in Sources */,
 				AF51F71029A72E55007A5A87 /* WeeklyBoxOfficeListResponseDTO+Mapping.swift in Sources */,
+				AF58927C29AD7B6000AFAF91 /* UIFont+Extension.swift in Sources */,
 				AF86FB2929AA41A900587221 /* ActorListPresentationController.swift in Sources */,
 				AF4A50EA29A7696D00201906 /* SearchWeekDaysBoxOfficeUseCase.swift in Sources */,
 				AF51F6F529A7214D007A5A87 /* DefaultMovieRepository.swift in Sources */,
