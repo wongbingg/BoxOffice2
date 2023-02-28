@@ -31,6 +31,7 @@ final class HomeViewController: UIViewController {
         button.setTitleColor(.secondaryLabel, for: .normal)
         button.backgroundColor = .systemGray5
         button.contentHorizontalAlignment = .left
+        button.accessibilityLabel = "보기모드 변경하기"
         return button
     }()
     
