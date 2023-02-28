@@ -12,7 +12,7 @@ final class MovieLabel: UILabel {
         super.init(frame: frame)
         self.translatesAutoresizingMaskIntoConstraints = false
         self.font = .preferredFont(forTextStyle: font)
-        
+        self.adjustsFontForContentSizeCategory = true
         if isBold {
             self.font = .boldSystemFont(ofSize: self.font.pointSize)
         }
