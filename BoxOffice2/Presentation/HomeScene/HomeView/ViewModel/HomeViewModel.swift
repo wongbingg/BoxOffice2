@@ -94,31 +94,16 @@ final class DefaultHomeViewModel: HomeViewModel {
     
     func movieTapped(at indexPath: IndexPath) {
         if viewMode == .daily {
-            dailyBoxOffices.subscribe { movieCellDatas in
-                let movie = movieCellDatas[indexPath.row]
-                self.actions?.showMovieDetail(movie)
-            } onError: { error in
-                print(error.localizedDescription)
-            }
-            .disposed(by: disposeBag)
+            let movie = dailyBoxOffices.value[indexPath.row]
+            self.actions?.showMovieDetail(movie)
         } else {
             
             if indexPath.section == 0 {
-                allWeekBoxOffices.subscribe { movieCellDatas in
-                    let movie = movieCellDatas[indexPath.row]
-                    self.actions?.showMovieDetail(movie)
-                } onError: { error in
-                    print(error.localizedDescription)
-                }
-                .disposed(by: disposeBag)
+                let movie = allWeekBoxOffices.value[indexPath.row]
+                self.actions?.showMovieDetail(movie)
             } else {
-                weekEndBoxOffices.subscribe { movieCellDatas in
-                    let movie = movieCellDatas[indexPath.row]
-                    self.actions?.showMovieDetail(movie)
-                } onError: { error in
-                    print(error.localizedDescription)
-                }
-                .disposed(by: disposeBag)
+                let movie = weekEndBoxOffices.value[indexPath.row]
+                self.actions?.showMovieDetail(movie)
             }
         }
     }
