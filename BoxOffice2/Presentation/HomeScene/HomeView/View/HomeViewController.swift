@@ -207,7 +207,9 @@ final class HomeViewController: UIViewController {
 // MARK: - UICollectionView Delegate
 extension HomeViewController: UICollectionViewDelegate {
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    func collectionView(_ collectionView: UICollectionView,
+                        didSelectItemAt indexPath: IndexPath) {
+        
         viewModel.movieTapped(at: indexPath)
     }
 }
@@ -230,7 +232,10 @@ extension HomeViewController: ModeSelectViewControllerDelegate {
         activityIndicator.startAnimating()
         let mode = BoxOfficeMode.allCases[indexPath]
         viewModel.changeViewMode(to: mode)
-        viewModeChangeButton.setTitle("▼ \(viewModel.viewMode.rawValue)".localized(), for: .normal)
+        viewModeChangeButton.setTitle(
+            "▼ \(viewModel.viewMode.rawValue)".localized(),
+            for: .normal
+        )
         
         if mode == .daily {
             self.homeCollectionView.switchMode(.daily, orientation: currentOrientation)
