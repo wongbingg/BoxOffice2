@@ -23,6 +23,15 @@ final class MovieDetailViewController: UIViewController {
         return stackView
     }()
     
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(frame: .zero)
+        indicator.tintColor = .systemBlue
+        indicator.style = .large
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
     private let viewModel: MovieDetailViewModel
     private let posterImageRepository: PosterImageRepository
     
@@ -139,10 +148,13 @@ private extension MovieDetailViewController {
         entireStackView.addArrangedSubview(movieMainInfoView)
         entireStackView.addArrangedSubview(movieSubInfoView)
         view.addSubview(entireStackView)
+        view.addSubview(activityIndicator)
     }
     
     func setupConstraint() {
         NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             entireStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             entireStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             entireStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
