@@ -6,25 +6,28 @@
 //
 
 import RxSwift
+import RxRelay
 
 struct MovieDetailViewModelActions {
     
 }
 
 protocol MovieDetailViewModelInput {
-    func fetchMovieDetailData() -> Observable<MovieDetailData>
+    func fetchMovieDetailData()
     func convertMovieInfo() -> [String]
 }
 
 protocol MovieDetailViewModelOutput {
-    var movieDetailData: MovieDetailData { get }
+    var movieDetailData: BehaviorRelay<MovieDetailData> { get }
 }
 
 protocol MovieDetailViewModel: MovieDetailViewModelInput, MovieDetailViewModelOutput {}
 
 final class DefaultMovieDetailViewModel: MovieDetailViewModel {
     // MARK: Output
-    private(set) var movieDetailData: MovieDetailData = MovieDetailData.stub()
+    private(set) var movieDetailData: BehaviorRelay<MovieDetailData> = .init(
+        value: MovieDetailData.stub()
+    )
     
     private let disposeBag = DisposeBag()
     private let actions: MovieDetailViewModelActions
@@ -53,17 +56,17 @@ final class DefaultMovieDetailViewModel: MovieDetailViewModel {
     
     func convertMovieInfo() -> [String] {
         let movieInfo = [
-            movieDetailData.title,
-            movieDetailData.openYear + " 개봉",
-            movieDetailData.ageLimit,
-            movieDetailData.currentRank + "위",
-            movieDetailData.directorName,
-            movieDetailData.actors.joined(separator: ","),
-            movieDetailData.genreName,
-            movieDetailData.isNewEntry ? "순위 진입" : "",
-            movieDetailData.openDate,
-            movieDetailData.rankChange + "단계 변동",
-            movieDetailData.showTime + "분"
+            movieDetailData.value.title,
+            movieDetailData.value.openYear + " 개봉",
+            movieDetailData.value.ageLimit,
+            movieDetailData.value.currentRank + "위",
+            movieDetailData.value.directorName,
+            movieDetailData.value.actors.joined(separator: ","),
+            movieDetailData.value.genreName,
+            movieDetailData.value.isNewEntry ? "순위 진입" : "",
+            movieDetailData.value.openDate,
+            movieDetailData.value.rankChange + "단계 변동",
+            movieDetailData.value.showTime + "분"
         ]
         
         return movieInfo

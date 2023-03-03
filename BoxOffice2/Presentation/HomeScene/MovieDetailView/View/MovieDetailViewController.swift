@@ -86,7 +86,7 @@ final class MovieDetailViewController: UIViewController {
 //MARK: Setup View
 extension MovieDetailViewController {
     private func setupView() {
-        movieSubInfoView.configure(with: viewModel.movieDetailData)
+        movieSubInfoView.configure(with: viewModel.movieDetailData.value)
         
         addSubView()
         setupConstraint()
@@ -103,7 +103,7 @@ extension MovieDetailViewController {
     }
     
     @objc private func moreActorButtonTapped() {
-        let actorList = viewModel.movieDetailData.actors
+        let actorList = viewModel.movieDetailData.value.actors
         let actorListViewController = ActorListViewController(actorList: actorList)
         present(actorListViewController, animated: true)
     }
@@ -118,9 +118,8 @@ extension MovieDetailViewController {
             target: self,
             action: #selector(shareButtonTapped)
         )
-        
         navigationItem.rightBarButtonItem = shareBarButton
-        navigationItem.title = viewModel.movieDetailData.title
+        navigationItem.title = viewModel.movieDetailData.value.title
     }
     
     @objc private func shareButtonTapped() {
