@@ -8,7 +8,7 @@
 import Foundation
 import RxSwift
 
-final class DefaultMovieRepository: MovieRepository {
+struct DefaultMovieRepository: MovieRepository {
     private let disposeBag = DisposeBag()
     
     func fetchDailyMovies(date: String) -> Observable<[MovieCellData]> {
