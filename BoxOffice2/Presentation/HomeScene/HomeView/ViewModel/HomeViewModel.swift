@@ -64,8 +64,8 @@ final class DefaultHomeViewModel: HomeViewModel {
     // MARK: Input
     func requestDailyData(with date: String) {
         searchDailyBoxOfficeUseCase.execute(date: date)
-            .subscribe { movieCellDatas in
-                self.dailyBoxOffices.accept(movieCellDatas)
+            .subscribe { [weak self] movieCellDatas in
+                self?.dailyBoxOffices.accept(movieCellDatas)
             } onError: { error in
                 print(error.localizedDescription)
             }
@@ -74,8 +74,8 @@ final class DefaultHomeViewModel: HomeViewModel {
     
     func requestAllWeekData(with date: String) {
         searchWeekDaysBoxOfficeUseCase.execute(date: date)
-            .subscribe { movieCellDatas in
-                self.allWeekBoxOffices.accept(movieCellDatas)
+            .subscribe { [weak self] movieCellDatas in
+                self?.allWeekBoxOffices.accept(movieCellDatas)
             } onError: { error in
                 print(error.localizedDescription)
             }
@@ -84,8 +84,8 @@ final class DefaultHomeViewModel: HomeViewModel {
     
     func requestWeekEndData(with date: String) {
         searchWeekEndBoxOfficeUseCase.execute(date: date)
-            .subscribe { movieCellDatas in
-                self.weekEndBoxOffices.accept(movieCellDatas)
+            .subscribe { [weak self] movieCellDatas in
+                self?.weekEndBoxOffices.accept(movieCellDatas)
             } onError: { error in
                 print(error.localizedDescription)
             }

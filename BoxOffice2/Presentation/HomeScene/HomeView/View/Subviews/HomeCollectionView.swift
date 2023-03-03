@@ -270,8 +270,8 @@ private extension HomeCollectionView {
         let headerRegistration = createHeaderRegistration()
         homeDataSource = createDataSource(with: cellRegistration)
         
-        homeDataSource?.supplementaryViewProvider = { (view, kind, index) in
-            return self.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: index)
+        homeDataSource?.supplementaryViewProvider = { [weak self] (view, kind, index) in
+            return self?.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: index)
         }
         if currentViewMode == .daily {
             snapshot.deleteAllItems()
@@ -305,7 +305,7 @@ private extension HomeCollectionView {
     func createHeaderRegistration() -> UICollectionView.SupplementaryRegistration<HeaderView> {
         let headerRegistration = UICollectionView.SupplementaryRegistration<HeaderView>(
             elementKind: "headerView"
-        ) { (supplementaryView, elementKind, indexPath) in
+        ) { [weak self] (supplementaryView, elementKind, indexPath) in
             
             if self.currentViewMode == .daily {
                 guard self.currentDate != "" else { return }
@@ -321,8 +321,8 @@ private extension HomeCollectionView {
     func createDailyCellRegistration(
     ) -> UICollectionView.CellRegistration<ListCell, String> {
         
-        let cellRegistration = UICollectionView.CellRegistration<ListCell, String> { (cell, _, id) in
-            
+        let cellRegistration = UICollectionView.CellRegistration<ListCell, String> { [weak self] (cell, _, id) in
+            guard let self = self else { return }
             let item = self.viewModel.dailyBoxOffices.value.filter { $0.uuid == id }
             self.setupCell(with: item[0], at: cell, id: id)
         }
@@ -332,8 +332,8 @@ private extension HomeCollectionView {
     func createWeeklyCellRegistration(
     ) -> UICollectionView.CellRegistration<GridCell, String> {
         
-        let cellRegistration = UICollectionView.CellRegistration<GridCell, String> { cell, index, id in
-
+        let cellRegistration = UICollectionView.CellRegistration<GridCell, String> { [weak self] cell, index, id in
+            guard let self = self else { return }
             let list = self.viewModel.allWeekBoxOffices.value + self.viewModel.weekEndBoxOffices.value
             let item = list.filter { $0.uuid == id }
             self.setupCell(with: item[0], at: cell, id: id)
@@ -348,16 +348,16 @@ private extension HomeCollectionView {
             cell.setPosterImageView(with: image)
         } else {
             self.posterImageRepository.fetchPosterImage(with: item.title, year: nil)
-                .subscribe { image in
+                .subscribe { [weak self] image in
                     guard let image = image else { return }
                     cell.setPosterImageView(with: image)
-                    self.assets[item.title] = image
+                    self?.assets[item.title] = image
                 } onError: { error in
                     print(error.localizedDescription)
                     cell.stopActivityIndicator()
                 } onCompleted: {
-                    DispatchQueue.main.async {
-                        self.setPostNeedsUpdate(id: id)
+                    DispatchQueue.main.async { [weak self] in
+                        self?.setPostNeedsUpdate(id: id)
                     }
                 }
                 .disposed(by: self.disposeBag)

@@ -57,24 +57,29 @@ final class MovieDetailViewController: UIViewController {
     }
     
     // MARK: Methods
-    private func fetchInitialData() {
-        viewModel.fetchMovieDetailData()
+    private func bindData() {
+        viewModel.movieDetailData
             .observe(on: MainScheduler.instance)
-            .subscribe { [self] movieDetailData in
-                movieMainInfoView.configure(
+            .subscribe { [weak self] movieDetailData in
+                self?.movieMainInfoView.configure(
                     with: movieDetailData,
                     rating: "",
-                    repository: posterImageRepository
+                    repository: (self?.posterImageRepository)!
                 )
-                movieSubInfoView.configure(with: movieDetailData)
-            } onError: { error in
+                self?.movieSubInfoView.configure(with: movieDetailData)
+                self?.activityIndicator.stopAnimating()
+            } onError: { [weak self] error in
+                guard let self = self else { return }
                 DefaultAlertBuilder(message: error.localizedDescription)
                     .setButton()
                     .showAlert(on: self)
-            } onCompleted: {
-                // activity indicator
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func fetchInitialData() {
+        viewModel.fetchMovieDetailData()
+        activityIndicator.startAnimating()
     }
 }
 

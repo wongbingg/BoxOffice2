@@ -136,9 +136,9 @@ final class HomeViewController: UIViewController {
     private func bindDailyBoxOffice() {
         viewModel.dailyBoxOffices
             .observe(on: MainScheduler.instance)
-            .subscribe { [self] movieCellDatas in
-                homeCollectionView.appendDailySnapshot(with: movieCellDatas.map { $0.uuid })
-                self.activityIndicator.stopAnimating()
+            .subscribe { [weak self] movieCellDatas in
+                self?.homeCollectionView.appendDailySnapshot(with: movieCellDatas.map { $0.uuid })
+                self?.activityIndicator.stopAnimating()
             } onError: { error in
                 print(error.localizedDescription)
             } onCompleted: {
@@ -149,9 +149,9 @@ final class HomeViewController: UIViewController {
     private func bindAllWeeksBoxOffice() {
         viewModel.allWeekBoxOffices
             .observe(on: MainScheduler.instance)
-            .subscribe { [self] movieCellDatas in
-                homeCollectionView.appendAllWeekSnapshot(with: movieCellDatas.map { $0.uuid })
-                self.activityIndicator.stopAnimating()
+            .subscribe { [weak self] movieCellDatas in
+                self?.homeCollectionView.appendAllWeekSnapshot(with: movieCellDatas.map { $0.uuid })
+                self?.activityIndicator.stopAnimating()
             } onError: { error in
                 print(error.localizedDescription)
             } onCompleted: {
@@ -162,9 +162,9 @@ final class HomeViewController: UIViewController {
     private func bindWeekEndBoxOffice() {
         viewModel.weekEndBoxOffices
             .observe(on: MainScheduler.instance)
-            .subscribe { [self] movieCellDatas in
-                homeCollectionView.appendWeekEndSnapshot(with: movieCellDatas.map { $0.uuid })
-                self.activityIndicator.stopAnimating()
+            .subscribe { [weak self] movieCellDatas in
+                self?.homeCollectionView.appendWeekEndSnapshot(with: movieCellDatas.map { $0.uuid })
+                self?.activityIndicator.stopAnimating()
             } onError: { error in
                 print(error.localizedDescription)
             } onCompleted: {

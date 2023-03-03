@@ -153,15 +153,15 @@ final class GridCell: UICollectionViewCell, MovieCellProtocol {
     }
 
     func setPosterImageView(with image: UIImage) {
-        DispatchQueue.main.async {
-            self.posterImageView.image = image
-            self.activityIndicator.stopAnimating()
+        DispatchQueue.main.async { [weak self] in
+            self?.posterImageView.image = image
+            self?.activityIndicator.stopAnimating()
         }
     }
     
     func stopActivityIndicator() {
-        DispatchQueue.main.async {
-            self.activityIndicator.stopAnimating()
+        DispatchQueue.main.async { [weak self] in
+            self?.activityIndicator.stopAnimating()
         }
     }
     

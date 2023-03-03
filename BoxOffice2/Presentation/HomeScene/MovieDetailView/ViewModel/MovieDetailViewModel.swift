@@ -41,19 +41,14 @@ final class DefaultMovieDetailViewModel: MovieDetailViewModel {
         self.searchMovieDetailUseCase = searchMovieDetailUseCase
     }
     
-    func fetchMovieDetailData() -> Observable<MovieDetailData> {
-        
-        return Observable.create { [self] emitter in
-            searchMovieDetailUseCase.execute(movie: movieCellData)
-                .subscribe { movieDetailData in
-                    self.movieDetailData = movieDetailData
-                    emitter.onNext(movieDetailData)
-                } onError: { error in
-                    emitter.onError(error)
-                } onCompleted: {
-                    emitter.onCompleted()
-                }
-        }
+    func fetchMovieDetailData() {
+        searchMovieDetailUseCase.execute(movie: movieCellData)
+            .subscribe { [weak self] movieDetailData in
+                self?.movieDetailData.accept(movieDetailData)
+            } onError: { error in
+                print(error.localizedDescription)
+            }
+            .disposed(by: disposeBag)
     }
     
     func convertMovieInfo() -> [String] {

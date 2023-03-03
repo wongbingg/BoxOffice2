@@ -17,19 +17,18 @@ final class DefaultPosterImageRepository: PosterImageRepository {
     }
     
     func fetchPosterImage(with title: String, year: String? = nil) -> Observable<UIImage?> {
-        return Observable.create { [self] emitter in
-            
-            if let urlString = urlHistory[title] {
-                return fetchPosterInCache(with: URL(string: urlString), emitter: emitter)
+        return Observable.create { [weak self] emitter in
+            if let urlString = self?.urlHistory[title] {
+                return self?.fetchPosterInCache(with: URL(string: urlString), emitter: emitter) ?? Disposables.create()
             } else {
                 return SearchMoviePosterAPI(movieTitle: title, year: year).execute()
-                    .subscribe { [self] moviePosterResponseDTO in
+                    .subscribe { moviePosterResponseDTO in
                         let urlString = moviePosterResponseDTO.toDomain()
-                        urlHistory[title] = urlString
-                        
+                        self?.urlHistory[title] = urlString
+
                         let url = URL(string: urlString)
-                        _ = fetchPosterInCache(with: url, emitter: emitter)
-                        
+                        _ = self?.fetchPosterInCache(with: url, emitter: emitter)
+
                     } onError: { error in
                         emitter.onError(error)
                     } onCompleted: {

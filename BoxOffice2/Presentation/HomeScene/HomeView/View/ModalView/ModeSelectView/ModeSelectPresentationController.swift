@@ -103,8 +103,9 @@ final class ModeSelectPresentationController: UIPresentationController {
             if velocity.y >= 100 {
                 presentedViewController.dismiss(animated: true)
             } else {
-                UIView.animate(withDuration: 0.2) { [self] in
-                    presentedView.center = originalPosition
+                UIView.animate(withDuration: 0.2) { [weak self] in
+                    guard let self = self else { return }
+                    presentedView.center = self.originalPosition
                 }
             }
         }

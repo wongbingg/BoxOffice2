@@ -184,14 +184,14 @@ final class MovieMainInfoView: UIView {
         
         posterImageRepository?.fetchPosterImage(with: title, year: nil)
             .observe(on: MainScheduler.instance)
-            .subscribe { image in
+            .subscribe { [weak self] image in
                 guard let image = image else { return }
-                self.posterImageView.image = image
-            } onError: { error in
-                self.activityIndicator.stopAnimating()
+                self?.posterImageView.image = image
+            } onError: { [weak self] error in
+                self?.activityIndicator.stopAnimating()
                 print(error.localizedDescription)
-            } onCompleted: {
-                self.activityIndicator.stopAnimating()
+            } onCompleted: { [weak self] in
+                self?.activityIndicator.stopAnimating()
             }
             .disposed(by: disposeBag)
     }
