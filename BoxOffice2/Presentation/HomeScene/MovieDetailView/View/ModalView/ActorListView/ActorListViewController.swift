@@ -67,7 +67,12 @@ final class ActorListViewController: UIViewController {
     
     private func addActor() {
         for actor in actorList {
-            let actorNameLabel = MovieLabel(font: .title3)
+            let actorNameLabel: UILabel = {
+                let label = UILabel()
+                label.translatesAutoresizingMaskIntoConstraints = false
+                label.font = UIFont.preferredFont(forTextStyle: .title3)
+                return label
+            }()
             actorNameLabel.textColor = .label
             actorNameLabel.text = actor
             actorStackView.addArrangedSubview(actorNameLabel)

@@ -106,11 +106,40 @@ final class MovieMainInfoView: UIView {
         return view
     }()
     
-    private let currentRanklabel = MovieLabel(font: .largeTitle, isBold: true)
-    private let titleLabel = MovieLabel(font: .title1, isBold: true)
-    private let openYearLabel = MovieLabel(font: .body)
-    private let genreLabel = MovieLabel(font: .body)
-    private let ratingLabel = MovieLabel(font: .largeTitle)
+    private let currentRanklabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(for: .largeTitle, weight: .bold)
+        return label
+    }()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(for: .title1, weight: .bold)
+        return label
+    }()
+    
+    private let openYearLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        return label
+    }()
+    
+    private let genreLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        return label
+    }()
+    
+    private let ratingLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(forTextStyle: .largeTitle)
+        return label
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)

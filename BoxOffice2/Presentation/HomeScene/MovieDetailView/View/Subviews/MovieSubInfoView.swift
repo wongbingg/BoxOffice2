@@ -52,13 +52,49 @@ final class MovieSubInfoView: UIView {
         return view
     }()
     
-    private let productionYearLabel = MovieLabel(font: .title3, isBold: true)
-    private var ageLimitLabel = MovieLabel(font: .title3, isBold: true)
-    private let showTimeLabel = MovieLabel(font: .title3, isBold: true)
-    private let totalAudienceLabel = MovieLabel(font: .title3, isBold: true)
-    private let directorNameLabel = MovieLabel(font: .body)
-    private let actorsLabel = MovieLabel(font: .body)
+    private let productionYearLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(for: .title3, weight: .bold)
+        return label
+    }()
     
+    private var ageLimitLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(for: .title3, weight: .bold)
+        return label
+    }()
+    
+    private let showTimeLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(for: .title3, weight: .bold)
+        return label
+    }()
+    
+    private let totalAudienceLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(for: .title3, weight: .bold)
+        return label
+    }()
+    
+    private let directorNameLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        return label
+    }()
+    
+    private let actorsLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        return label
+    }()
+    
+    // MARK: Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
