@@ -303,15 +303,17 @@ private extension HomeCollectionView {
     }
     
     func createHeaderRegistration() -> UICollectionView.SupplementaryRegistration<HeaderView> {
+        
         let headerRegistration = UICollectionView.SupplementaryRegistration<HeaderView>(
             elementKind: "headerView"
         ) { [weak self] (supplementaryView, elementKind, indexPath) in
             
-            if self.currentViewMode == .daily {
-                guard self.currentDate != "" else { return }
-                supplementaryView.sectionHeaderlabel.text = self.currentDate
+            if self?.currentViewMode == .daily {
+                guard self?.currentDate != "" else { return }
+                supplementaryView.setHeaderViewTitle(text: self?.currentDate ?? "날짜정보없음")
             } else {
-                supplementaryView.sectionHeaderlabel.text = Section.allCases[indexPath.section].rawValue.localized()
+                let headerText = Section.allCases[indexPath.section].rawValue.localized()
+                supplementaryView.setHeaderViewTitle(text: headerText)
             }
         }
         return headerRegistration

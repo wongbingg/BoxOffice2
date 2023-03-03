@@ -8,7 +8,7 @@
 import UIKit
 
 final class HeaderView: UICollectionReusableView {
-    let sectionHeaderlabel: UILabel = {
+    private let sectionHeaderlabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .label
@@ -28,5 +28,9 @@ final class HeaderView: UICollectionReusableView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setHeaderViewTitle(text: String) {
+        sectionHeaderlabel.text = text
     }
 }
