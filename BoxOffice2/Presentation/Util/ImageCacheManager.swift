@@ -13,7 +13,7 @@ protocol ImageCacheManager {
     func getImage(with imageURL: URL?) -> Observable<UIImage?>
 }
 
-final class DefaultImageCacheManager: ImageCacheManager {
+struct DefaultImageCacheManager: ImageCacheManager {
     private let disposeBag = DisposeBag()
     private let cache = URLCache.shared
     private var dataTask: URLSessionDataTask?
