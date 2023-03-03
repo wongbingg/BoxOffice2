@@ -283,6 +283,38 @@ NSDiffableDataSourceSnapshot 에 존재하는 reloadItem() 메서드와 reconfig
 |`로딩속도 약 3초`|`로딩 속도 1초 이내`|
 
 
+### 🛠 화면전환시 메모리 allocation 증가 현상 
+
+![](https://i.imgur.com/TGBRJoE.jpg)
+
+선택영역의 카테고리들이 MovieDetailViewController로 들어갔다가 나올 때마다 증가하는 문제가 발생했습니다. 
+
+원인 분석 결과, RxSwift의 사용에서 문제가 있었습니다. 
+
+```swift
+private func bindData() {
+        viewModel.movieDetailData
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] movieDetailData in
+                self?.movieMainInfoView.configure(
+                    with: movieDetailData,
+                    rating: "",
+                    repository: (self?.posterImageRepository)!
+                )
+                self?.movieSubInfoView.configure(with: movieDetailData)
+                self?.activityIndicator.stopAnimating()
+            } onError: { [weak self] error in
+                guard let self = self else { return }
+                DefaultAlertBuilder(message: error.localizedDescription)
+                    .setButton()
+                    .showAlert(on: self)
+            }
+            .disposed(by: disposeBag)
+    }
+```
+
+위 코드로 변경하기 전에 [weak self] 처리를 해주지 않았었는데, 이 때문에 참조가 남아있어 allocation이 계속 증가 한 것으로 판단되었습니다. 위 코드처럼 모두 [weak self] 로 처리해준 결과, allocation이 쌓이는 현상이 없어졌습니다. 
+![](https://i.imgur.com/2PHJiaE.jpg)
 
 ## 🔗 References
 - [Table and Collection View Cells Reload Improvements in iOS 15](https://swiftsenpai.com/development/cells-reload-improvements-ios-15/)
