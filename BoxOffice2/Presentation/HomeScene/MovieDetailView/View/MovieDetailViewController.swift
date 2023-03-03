@@ -19,7 +19,12 @@ final class MovieDetailViewController: UIViewController {
         stackView.spacing = 0
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.isLayoutMarginsRelativeArrangement = true
-        stackView.layoutMargins = UIEdgeInsets.init(top: 0, left: 0, bottom: 400, right: 0)
+        stackView.layoutMargins = UIEdgeInsets.init(
+            top: 0,
+            left: 0,
+            bottom: 400,
+            right: 0
+        )
         return stackView
     }()
     
@@ -52,6 +57,7 @@ final class MovieDetailViewController: UIViewController {
     // MARK: View LifeCycles
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
+        bindData()
         fetchInitialData()
     }
     
@@ -107,8 +113,10 @@ extension MovieDetailViewController {
 //MARK: Button Action
 extension MovieDetailViewController {
     private func addTagetButton() {
-        movieSubInfoView.addTargetMoreButton(with: self,
-                                             selector: #selector(moreActorButtonTapped))
+        movieSubInfoView.addTargetMoreButton(
+            with: self,
+            selector: #selector(moreActorButtonTapped)
+        )
     }
     
     @objc private func moreActorButtonTapped() {

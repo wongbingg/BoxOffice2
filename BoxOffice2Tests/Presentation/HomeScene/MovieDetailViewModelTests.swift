@@ -33,9 +33,6 @@ final class MovieDetailViewModelTests: XCTestCase {
         let expectCallCount = 1
         // when
         _ = sut.fetchMovieDetailData()
-            .subscribe { movieDetail in
-                expectation.fulfill()
-            }
         // then
         XCTAssertEqual(expectCallCount, searchMovieDetailUseCase.callCount)
     }

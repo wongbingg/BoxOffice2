@@ -287,11 +287,14 @@ private extension HomeCollectionView {
     private func createDataSource<T: UICollectionViewCell>(
         with cellRegistration: UICollectionView.CellRegistration<T, String>
     ) -> UICollectionViewDiffableDataSource<Section, String>? {
+        
         let dataSource = UICollectionViewDiffableDataSource<Section, String>(
-            collectionView: self) {
-            (collectionView: UICollectionView,
-             indexPath: IndexPath,
-             itemIdentifier: String) -> UICollectionViewCell? in
+            collectionView: self
+        ) { (
+            collectionView: UICollectionView,
+            indexPath: IndexPath,
+            itemIdentifier: String
+        ) -> UICollectionViewCell? in
                 
             return collectionView.dequeueConfiguredReusableCell(
                 using: cellRegistration,
